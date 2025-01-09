@@ -1,7 +1,5 @@
-from  Entidades.entidade_base import EntidadeBase
+from Entidades.entidade_base import EntidadeBase
 from Entidades import funcoes
-
-
 
 
 class Cliente(EntidadeBase):
@@ -9,7 +7,9 @@ class Cliente(EntidadeBase):
     def get_formato(cls):
         # Define o formato do registro para Cliente
         return '=i30si14s70s20s30s'
-    def criar_registro(self, cod, arquivo):
+
+    def criar_registro(self, cod, **kwargs):
+
         codigo = cod
         nome = (self.fake.name())[:30]
         idade = self.fake.random_int(min=18, max=70)
@@ -23,6 +23,9 @@ class Cliente(EntidadeBase):
 
     def imprimir_registro(self, registro):
         registro_lido = self.ler_registro(registro)
+        if registro_lido[0] is None:
+            return
+        print('[CLIENTE]')
         print(f"Codigo: [{registro_lido[0]}]")
         print(f"Nome: {registro_lido[1].decode('utf-8').rstrip(chr(0))}")
         print(f"Idade: {registro_lido[2]}")
@@ -31,5 +34,3 @@ class Cliente(EntidadeBase):
         print(f"Telefone: {registro_lido[5].decode('utf-8').rstrip(chr(0))}")
         print(f"Email: {registro_lido[6].decode('utf-8').rstrip(chr(0))}")
         print(f'{80 * "-"}')
-
-

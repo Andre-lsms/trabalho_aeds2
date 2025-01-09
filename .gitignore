@@ -175,3 +175,4 @@ cython_debug/
 .idea/modules.xml
 .idea/trabalho_aeds2_pt1.iml
 .idea/vcs.xml
+*.dat
