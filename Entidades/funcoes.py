@@ -28,3 +28,15 @@ def tamanho_arquivo(arquivo):
 
 def tamanho_registro(entidade):
     return struct.calcsize(entidade.get_formato())
+
+
+def pesquisa_sequencial(id, arquivo, endidade):
+    tamanho = tamanho_arquivo(arquivo)
+    arquivo.seek(0)
+    for i in range(tamanho // tamanho_registro(endidade)):
+        registro = endidade.ler_registro(arquivo)
+        if registro[0] == id:
+            print(f"Registro [{id}]encontrado")
+            endidade.imprimir_registro(registro)
+            return i
+    return -1
