@@ -59,11 +59,13 @@ class EntidadeBase:
     def imprimir_base(self, arquivo):
         arquivo.seek(0)
 
-        while True:
-            try:
-                self.imprimir_registro(arquivo)
-            except TypeError:
-                break
+        while registro_lido := self.ler_registro(arquivo):
+                if registro_lido[0] is None:
+                    print('erro1')
+                    break
+
+                self.imprimir_registro(registro_lido)
+
 
     @classmethod
     def get_formato(cls):

@@ -22,15 +22,12 @@ class Cliente(EntidadeBase):
             'utf-8'), email.encode('utf-8')
 
     def imprimir_registro(self, registro):
-        registro_lido = self.ler_registro(registro)
-        if registro_lido[0] is None:
-            return
         print('[CLIENTE]')
-        print(f"Codigo: [{registro_lido[0]}]")
-        print(f"Nome: {registro_lido[1].decode('utf-8').rstrip(chr(0))}")
-        print(f"Idade: {registro_lido[2]}")
-        print(f"CPF: {registro_lido[3].decode('utf-8').rstrip(chr(0))}")
-        print(f"Endereco: {registro_lido[4].decode('utf-8').rstrip(chr(0))}")
-        print(f"Telefone: {registro_lido[5].decode('utf-8').rstrip(chr(0))}")
-        print(f"Email: {registro_lido[6].decode('utf-8').rstrip(chr(0))}")
+        print(f"Codigo: [{registro[0]}]")
+        print(f"Nome: {registro[1].decode('utf-8').rstrip(chr(0))}")
+        print(f"Idade: {registro[2]}")
+        print(f"CPF: {registro[3].decode('utf-8').rstrip(chr(0))}")
+        print(f"Endereco: {registro[4].decode('utf-8').rstrip(chr(0))}")
+        print(f"Telefone: {registro[5].decode('utf-8').rstrip(chr(0))}")
+        print(f"Email: {registro[6].decode('utf-8').rstrip(chr(0))}")
         print(f'{80 * "-"}')

@@ -41,15 +41,12 @@ class Aluguel(EntidadeBase):
         return codigo, id_cliente, nome_cliente, id_carro, modelo_carro,marca_carro, diaria, id_filia_aluguel, nome_filial_aluguel, id_filial_devolucao, nome_filial_devolucao
 
     def imprimir_registro(self, registro):
-        registro_lido = self.ler_registro(registro)
-        if registro_lido[0] is None:
-            return
-        print(f"Codigo: [{registro_lido[0]}]")
-        print(f"Cliente: [{registro_lido[1]}] {registro_lido[2].decode('utf-8').rstrip(chr(0))}")
-        print(f"Carro: [{registro_lido[3]}] {registro_lido[4].decode('utf-8').rstrip(chr(0))} - {registro_lido[5].decode('utf-8').rstrip(chr(0))}")
-        print(f"Diaria: R$ {registro_lido[6]}")
-        print(f"Filial de Aluguel: [{registro_lido[7]}] {registro_lido[8].decode('utf-8').rstrip(chr(0))}")
-        print(f"Filial de Devolucao: [{registro_lido[9]}] {registro_lido[10].decode('utf-8').rstrip(chr(0))}")
+        print(f"Codigo: [{registro[0]}]")
+        print(f"Cliente: [{registro[1]}] {registro[2].decode('utf-8').rstrip(chr(0))}")
+        print(f"Carro: [{registro[3]}] {registro[4].decode('utf-8').rstrip(chr(0))} - {registro[5].decode('utf-8').rstrip(chr(0))}")
+        print(f"Diaria: R$ {registro[6]}")
+        print(f"Filial de Aluguel: [{registro[7]}] {registro[8].decode('utf-8').rstrip(chr(0))}")
+        print(f"Filial de Devolucao: [{registro[9]}] {registro[10].decode('utf-8').rstrip(chr(0))}")
         print(80 * '-')
 
     def criar_base(self, tamanho, **kwargs):
