@@ -1,6 +1,6 @@
-import struct
-from faker import Faker
 from random import shuffle
+
+from Entidades.funcoes import *
 
 fake = Faker('pt_BR')
 
@@ -18,7 +18,6 @@ class EntidadeBase:
     def salvar_registro(self, arquivo=None, registro=None):
         formato = self.get_formato()
         dados_binarios = struct.pack(formato, *registro)
-
         arquivo.write(dados_binarios)
 
     @classmethod
@@ -36,13 +35,13 @@ class EntidadeBase:
             print(f"Erro ao desempacotar registro: {e}")
             return None
 
-    def imprimir_registro(self, arquivo):
+    def imprimir_registro(self, arquivo,saida):
         """
         Subclasses devem implementar este método para imprimir o registro.
         """
         raise NotImplementedError("Subclasses devem implementar o método imprimir_registro")
 
-    def criar_base(self, tamanho, **kwargs):
+    def criar_base(self, tamanho, desordenada=True, **kwargs):
         arquivo = kwargs.get('arquivo')
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
@@ -51,21 +50,20 @@ class EntidadeBase:
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
-        shuffle(codigos)
+        if desordenada:
+            shuffle(codigos)
         for i in codigos:
             registro_criado = (self.criar_registro(i, arquivo=arquivo))
             self.salvar_registro(arquivo=arquivo, registro=registro_criado)
 
-    def imprimir_base(self, arquivo):
+    def imprimir_base(self, arquivo,saida):
         arquivo.seek(0)
 
         while registro_lido := self.ler_registro(arquivo):
-                if registro_lido[0] is None:
-                    print('erro1')
-                    break
+            if registro_lido[0] is None:
+                break
 
-                self.imprimir_registro(registro_lido)
-
+            self.imprimir_registro(registro_lido,saida)
 
     @classmethod
     def get_formato(cls):
@@ -74,3 +72,9 @@ class EntidadeBase:
         Subclasses devem implementar este método para retornar o formato do struct.
         """
         raise NotImplementedError("Subclasses devem implementar o método get_formato")
+
+    def num_registros(self, arquivo):
+        arquivo.seek(0)
+        num_registros = tamanho_arquivo(arquivo) // struct.calcsize(self.get_formato())
+        return num_registros
+

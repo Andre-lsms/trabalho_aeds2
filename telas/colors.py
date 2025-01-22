@@ -1,0 +1,10 @@
+def cinza_escuro():
+    return "#4A4A4A"
+def cinza_claro():
+    return "#6A7B76"
+def verde_escuro():
+    return "#1C7C54"
+def vermelho():
+    return "#8C271E"
+def branco():
+    return "#EBEBD3"

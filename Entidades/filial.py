@@ -10,21 +10,18 @@ class Filial(EntidadeBase):
 
     def criar_registro(self, cod, **kwargs):
         codigo = cod
-        nome = (self.fake.company())[:30]
-        endereco = (funcoes.gerar_endereco())[:70]
-        telefone = (self.fake.cellphone_number())[:20]
-        email = (self.fake.email())[:30]
+        nome = kwargs.get('nome'[:30], (self.fake.company())[:30])
+        endereco = kwargs.get('endereco'[:70], (funcoes.gerar_endereco())[:70])
+        telefone = kwargs.get('telefone'[:20], (self.fake.cellphone_number())[:20])
+        email = kwargs.get('email'[:30], (self.fake.email())[:30])
+
         return codigo, nome.encode('utf-8'), endereco.encode('utf-8'), telefone.encode('utf-8'), email.encode('utf-8')
 
-    def imprimir_registro(self, arquivo):
-        registro_lido = self.ler_registro(arquivo)
-        if registro_lido[0] is None:
-            return
+    def imprimir_registro(self, registro,saida):
+        saida.write(f"Codigo: [{registro[0]}]")
+        saida.write(f"Nome: {registro[1].decode('utf-8').rstrip(chr(0))}")
+        saida.write(f"Endereco: {registro[2].decode('utf-8').rstrip(chr(0))}")
+        saida.write(f"Telefone: {registro[3].decode('utf-8').rstrip(chr(0))}")
+        saida.write(f"Email: {registro[4].decode('utf-8').rstrip(chr(0))}")
+        saida.write(f'{95 * "_"}')
 
-        print('[FILIAL]')
-        print(f"Codigo: [{registro_lido[0]}]")
-        print(f"Nome: {registro_lido[1].decode('utf-8').rstrip(chr(0))}")
-        print(f"Endereco: {registro_lido[2].decode('utf-8').rstrip(chr(0))}")
-        print(f"Telefone: {registro_lido[3].decode('utf-8').rstrip(chr(0))}")
-        print(f"Email: {registro_lido[4].decode('utf-8').rstrip(chr(0))}")
-        print(f'{80 * "-"}')
