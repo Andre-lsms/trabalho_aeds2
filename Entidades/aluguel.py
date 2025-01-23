@@ -1,3 +1,4 @@
+import random
 from random import shuffle
 
 from Entidades.entidade_base import EntidadeBase
@@ -30,8 +31,7 @@ class Aluguel(EntidadeBase):
         arquivo_carro = kwargs.get('arquivo_carro')
         arquivo_filial = kwargs.get('arquivo_filial')
         self.codigo = codigo
-        self.cliente = clientes.ler_registro(arquivo_cliente)
-        self.carro = carros.ler_registro(arquivo_carro)
+
 
     def imprimir_registro(self, registro):
         print(f"Codigo: [{registro[0]}]")
@@ -61,3 +61,10 @@ class Aluguel(EntidadeBase):
     def get_formato(self):
         # Define o formato do registro para Aluguel
         return '=ii30si30s30sii30si30s'
+
+    def escolher_registro_aleatorio(self,arquivo,entidade):
+        tamanho = entidade.tamanho_arquivo(arquivo)
+        quant_arquivos = tamanho // entidade.tamanho_registro()
+        posicao = random.randint(0,quant_arquivos-1)
+        arquivo.seek(posicao*entidade.tamanho_registro)
+        return entidade.ler_registro(arquivo)
