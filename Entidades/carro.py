@@ -75,7 +75,7 @@ class Carro(EntidadeBase):
     def get_formato(self):
         return '=i7s30s30s15si'
     def tamanho_registro(self):
-        return struct.calcsize(self.get_formato())
+        return int(struct.calcsize(self.get_formato()))
 
 
 marcas_modelos = {

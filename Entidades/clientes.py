@@ -79,10 +79,10 @@ class Cliente(EntidadeBase):
             print(f"Erro ao desempacotar registro: {e}")
             return None
 
-
-
     def get_formato(self):
         return "=i30si14s70s20s30s"
 
     def tamanho_registro(self):
-        return struct.calcsize(self.get_formato())
+        tamanho = struct.calcsize(self.get_formato())
+        tamanho= int(tamanho)
+        return tamanho

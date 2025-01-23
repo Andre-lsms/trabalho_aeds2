@@ -38,7 +38,7 @@ class EntidadeBase:
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
-        shuffle(codigos)
+        # shuffle(codigos)
         for i in range(len(codigos)):
             registro = self.criar_registro(codigos[i])
             self.salvar_registro(arquivo, registro)
@@ -53,8 +53,9 @@ class EntidadeBase:
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
 
     def tamanho_arquivo(self, arquivo):
-        tamanho = arquivo.tell() / self.tamanho_registro()
-        return tamanho
+        arquivo.seek(0,2)
+        tamanho = arquivo.tell()
+        return int(tamanho)
 
     def get_formato(self):
         """
