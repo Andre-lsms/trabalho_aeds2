@@ -30,9 +30,9 @@ class Filial(EntidadeBase):
         try:
             arquivo.write(struct.pack('i', registro.codigo))
             arquivo.write(struct.pack('30s', registro.nome.encode('utf-8')))
-            arquivo.write(struct.pack('70s', registro.endereco.encode('utf-8')))
-            arquivo.write(struct.pack('20s', registro.telefone.encode('utf-8')))
             arquivo.write(struct.pack('30s', registro.email.encode('utf-8')))
+            arquivo.write(struct.pack('20s', registro.telefone.encode('utf-8')))
+            arquivo.write(struct.pack('70s', registro.endereco.encode('utf-8')))
         except struct.error as e:
             print(f"Erro ao empacotar registro: {e}")
 
@@ -40,9 +40,9 @@ class Filial(EntidadeBase):
         print(f'{95 * "_"}')
         print(f"Código: {registro.codigo}")
         print(f"Nome: {registro.nome.upper().strip()}")
-        print(f"Endereço: {registro.endereco.strip()}")
-        print(f"Telefone: {registro.telefone.strip()}")
         print(f"Email: {registro.email.strip()}")
+        print(f"Telefone: {registro.telefone.strip()}")
+        print(f"Endereço: {registro.endereco.strip()}")
         print(f'{96 * "_"}')
 
     def ler_registro(self, arquivo):
@@ -51,18 +51,18 @@ class Filial(EntidadeBase):
             if len(registro_bytes) < self.tamanho_registro():
                 return None
             registro = struct.unpack(self.get_formato(), registro_bytes)
-            cod, nome, endereco, telefone, email = registro
+            cod, nome, email, telefone, endereco = registro
             return Filial(
                 cod=cod,
                 nome=nome.decode('utf-8').rstrip(chr(0)),
-                endereco=endereco.decode('utf-8').rstrip(chr(0)),
+                email=email.decode('utf-8').rstrip(chr(0)),
                 telefone=telefone.decode('utf-8').rstrip(chr(0)),
-                email=email.decode('utf-8').rstrip(chr(0))
+                endereco=endereco.decode('utf-8').rstrip(chr(0))
             )
         except struct.error as e:
             print(f"Erro ao desempacotar registro: {e}")
 
     def get_formato(self):
-        return '=i30s70s20s30s'
+        return '=i30s30s20s70s'
     def tamanho_registro(self):
         return struct.calcsize(self.get_formato())

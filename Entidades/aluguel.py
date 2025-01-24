@@ -52,7 +52,6 @@ class Aluguel(EntidadeBase):
         self.diaria = self.fake.random_int(min=100, max=600)
         self.tempo =(datetime.date.today() - self.data_aluguel).days
         self.valor_total = self.diaria * self.tempo
-        print(f'Valor total: {self.valor_total}')
         return Aluguel(
             codigo=self.codigo,
             id_cliente=self.id_cliente,
@@ -115,7 +114,7 @@ class Aluguel(EntidadeBase):
         except struct.error as e:
             print(f"Erro ao desempacotar registro: {e}")
 
-    def criar_base(self, tamanho, **kwargs):
+    def criar_base(self, tamanho,desordenada = True, **kwargs):
         arquivo = kwargs.get('arquivo')
         arquivo_cliente = kwargs.get('arquivo_cliente')
         arquivo_carro = kwargs.get('arquivo_carro')
@@ -129,7 +128,8 @@ class Aluguel(EntidadeBase):
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
-        # shuffle(codigos)
+        if desordenada:
+            random.shuffle(codigos)
         for i in range(len(codigos)):
             registro = self.criar_registro(codigo=codigos[i], arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
                                           arquivo_filial=arquivo_filial)

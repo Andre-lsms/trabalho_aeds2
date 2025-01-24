@@ -26,12 +26,12 @@ registro_carro = []
 registro_filial = []
 registro_aluguel = []
 
-cliente.criar_base(1000, arquivo=arquivo_cliente, desordenada=True)
-carro.criar_base(1000, arquivo=arquivo_carro, desordenada=True)
-filial.criar_base(1000, arquivo=arquivo_filial, desordenada=True)
+cliente.criar_base(1000, arquivo=arquivo_cliente, desordenada=False)
+carro.criar_base(1000, arquivo=arquivo_carro, desordenada=False)
+filial.criar_base(1000, arquivo=arquivo_filial, desordenada=False)
 
 aluguel.criar_base(1000, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
-                   arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
+                   arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=False,
                    arquivo_log=arquivo_log)
 
 
@@ -67,31 +67,7 @@ def main(page: ft.Page):
 
 
 
-    switch_sort = ft.Switch(
-        value=False,
-        on_change=lambda e: switch_change(),
-        width=60,
-        height=30,
-        hover_color=verde_escuro(),
-        active_color=verde_escuro(),
-        thumb_color=verde_escuro(),
-        inactive_thumb_color=cinza_claro(),
-        track_outline_color=branco(),
-    )
 
-    def switch_change():
-        if switch_sort.value:
-            insertionsort(arquivo_cliente, arquivo_log, cliente)
-            insertionsort(arquivo_carro, arquivo_log, carro)
-            insertionsort(arquivo_filial, arquivo_log, filial)
-            insertionsort(arquivo_aluguel, arquivo_log, aluguel)
-            update_content(tabs.selected_index)
-        else:
-            desordenar_bases(arquivo_cliente, arquivo_log, cliente)
-            desordenar_bases(arquivo_carro, arquivo_log, carro)
-            desordenar_bases(arquivo_filial, arquivo_log, filial)
-            desordenar_bases(arquivo_aluguel, arquivo_log, aluguel)
-            update_content(tabs.selected_index)
 
     def update_content(index,):
         content_container.controls.clear()
@@ -99,11 +75,11 @@ def main(page: ft.Page):
             content_container.controls.extend(
                 home(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
                      arquivo_carro, carro, arquivo_filial, filial, arquivo_log,
-                     switch_sort))
+                     ))
         elif index == 1:
             content_container.controls.extend(criar_aluguel(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
                                                             arquivo_carro, carro, arquivo_filial, filial, arquivo_log,
-                                                            switch_sort))
+                                                            ))
         elif index == 2:
             content_container.controls.extend(pg_clientes(page, arquivo_cliente, cliente))
         elif index == 3:
@@ -154,7 +130,6 @@ def main(page: ft.Page):
             ft.Row(
                 controls=[
                     ft.Text("Tipo de Busca: ", size=12, weight=ft.FontWeight.BOLD, color=branco()),
-                    switch_sort
                 ],
 
             ),

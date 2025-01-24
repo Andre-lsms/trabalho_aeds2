@@ -1,12 +1,20 @@
 import flet as ft
 
 from Entidades import funcoes
+from Entidades.aluguel import Aluguel
+from Entidades.carro import Carro
+from Entidades.clientes import Cliente
+from Entidades.filial import Filial
+from Funcoes.pesquiesa import *
 from telas.colors import *
-from Entidades.funcoes import get_switch
 
+cliente = Cliente()
+carro = Carro()
+filial = Filial()
+aluguel = Aluguel()
 
 def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
-         arquivo_filial, filial, arquivo_log, switch):
+         arquivo_filial, filial, arquivo_log, ):
 
     caixa_pesquisa_aluguel = ft.TextField(
         label='Pesquisar Aluguel',
@@ -22,7 +30,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
         prefix_style=ft.TextStyle(color=branco(), size=12, font_family='Inter', weight=ft.FontWeight.BOLD, ),
     )
     botao_pesquisa = ft.ElevatedButton(
-        text=get_switch(switch)[1],
+        text='get_switch(switch)[1]',
         color=branco(),
         bgcolor=verde_escuro(),
         width=150,
@@ -30,7 +38,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
             shape=ft.RoundedRectangleBorder(radius=10),
         ),
         height=50,
-        on_click=lambda e: busca(e, get_switch(switch)[0])
+        on_click=lambda e: busca(e,)
     )
 
     caixa_id_cliente = ft.TextField(
@@ -424,25 +432,25 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
 
     def busca(e, t_busca):
         if caixa_pesquisa_aluguel.value != '':
+            carro_busca = Carro()
+            cliente_busca = Cliente()
+            filial_busca = Filial()
             id = caixa_pesquisa_aluguel.value
-            filial_busca = []
-            carro_busca = []
-            cliente_busca = []
             try:
                 id = int(id)
-
+                
                 if t_busca == 'binaria':
-                    registro = funcoes.pesquisa_binaria(id, arquivo_aluguel, aluguel, arquivo_log)
+                    registro = pesquisa_binaria(id, arquivo_aluguel, aluguel, arquivo_log)
                     if registro != -1:
-                        cliente_busca = funcoes.pesquisa_binaria(registro[1], arquivo_cliente, cliente, arquivo_log)
-                        carro_busca = funcoes.pesquisa_binaria(registro[4], arquivo_carro, carro, arquivo_log)
-                        filial_busca = funcoes.pesquisa_binaria(registro[9], arquivo_filial, filial, arquivo_log)
+                        cliente_busca = funcoes.pesquisa_binaria(registro.codigo, arquivo_cliente, cliente, arquivo_log)
+                        carro_busca = funcoes.pesquisa_binaria(registro.codigo, arquivo_carro, carro, arquivo_log)
+                        filial_busca = pesquisa_binaria(registro.codigo, arquivo_filial, filial, arquivo_log)
                 else:
-                    registro = funcoes.pesquisa_sequencial(id, arquivo_aluguel, aluguel, arquivo_log)
+                    registro = pesquisa_sequencial(id, arquivo_aluguel, aluguel, arquivo_log)
                     if registro != -1:
-                        cliente_busca = funcoes.pesquisa_sequencial(registro[1], arquivo_cliente, cliente, arquivo_log)
-                        carro_busca = funcoes.pesquisa_sequencial(registro[4], arquivo_carro, carro, arquivo_log)
-                        filial_busca = funcoes.pesquisa_sequencial(registro[9], arquivo_filial, filial, arquivo_log)
+                        cliente_busca = pesquisa_sequencial(registro.codigo, arquivo_cliente, cliente, arquivo_log)
+                        carro_busca = pesquisa_sequencial(registro.codigo, arquivo_carro, carro, arquivo_log)
+                        filial_busca = pesquisa_sequencial(registro.codigo, arquivo_filial, filial, arquivo_log)
 
                 if registro == -1:
                     caixa_pesquisa_aluguel.label = 'não encontrado'
@@ -476,34 +484,35 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
 
 
                     # Cliente
-                    caixa_id_cliente.value = cliente_busca[0]
-                    caixa_nome_cliente.value = cliente_busca[1].decode('utf-8').rstrip(chr(0))
-                    caixa_idade_cliente.value = cliente_busca[2]
-                    caixa_cpf_cliente.value = cliente_busca[3].decode('utf-8').rstrip(chr(0))
-                    caixa_endereco_cliente.value = cliente_busca[4].decode('utf-8').rstrip(chr(0))
-                    caixa_telefone_cliente.value = cliente_busca[5].decode('utf-8').rstrip(chr(0))
-                    caixa_email_cliente.value = cliente_busca[6].decode('utf-8').rstrip(chr(0))
+                    caixa_id_cliente.value = cliente_busca.codigo
+                    caixa_nome_cliente.value = cliente_busca.nome
+                    caixa_idade_cliente.value = cliente_busca.idade
+                    caixa_cpf_cliente.value = cliente_busca.cpf
+                    caixa_email_cliente.value = cliente_busca.email
+                    caixa_telefone_cliente.value = cliente_busca.telefone
+                    caixa_endereco_cliente.value = cliente_busca.endereco
 
                     # Carro
-                    caixa_id_carro.value = carro_busca[0]
-                    caixa_placa_carro.value = carro_busca[1].decode('utf-8').rstrip(chr(0))
-                    caixa_marca_carro.value = carro_busca[2].decode('utf-8').rstrip(chr(0))
-                    caixa_modelo_carro.value = carro_busca[3].decode('utf-8').rstrip(chr(0))
-                    caixa_cor_carro.value = carro_busca[4].decode('utf-8').rstrip(chr(0))
-                    caixa_ano_carro.value = carro_busca[5]
+                    caixa_id_carro.value = carro_busca.codigo
+                    caixa_placa_carro.value = carro_busca.placa
+                    caixa_marca_carro.value = carro_busca.marca
+                    caixa_modelo_carro.value = carro_busca.modelo
+                    caixa_cor_carro.value = carro_busca.cor
+                    caixa_ano_carro.value = carro_busca.ano
 
                     # Filial
 
-                    caixa_id_filial.value = filial_busca[0]
-                    caixa_nome_filial.value = filial_busca[1].decode('utf-8').rstrip(chr(0))
-                    caixa_endereco_filial.value = filial_busca[2].decode('utf-8').rstrip(chr(0))
-                    caixa_telefone_filial.value = filial_busca[3].decode('utf-8').rstrip(chr(0))
-                    caixa_email_filial.value = filial_busca[4].decode('utf-8').rstrip(chr(0))
-                    # Preço
-                    caixa_valor_diaria.value = registro[8]
+                    caixa_id_filial.value = filial_busca.codigo
+                    caixa_nome_filial.value = filial_busca.nome
+                    caixa_email_filial.value = filial_busca.email
+                    caixa_telefone_filial.value = filial_busca.telefone
+                    caixa_endereco_filial.value = filial_busca.endereco
 
-                    if registro[7].decode('utf-8').rstrip(chr(0)) != '':
-                        update_img(registro[7].decode('utf-8').rstrip(chr(0)))
+                    # Preço
+                    caixa_valor_diaria.value = registro.diaria
+
+                    if carro_busca.modelo != '':
+                        update_img(carro_busca.modelo)
                     else:
                         update_img("Default")
                     e.page.update()

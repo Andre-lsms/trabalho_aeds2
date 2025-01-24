@@ -1,7 +1,6 @@
 import flet as ft
 
 from Entidades import funcoes
-from Entidades.funcoes import get_switch
 from telas.colors import *
 
 registro_cliente = []
@@ -20,7 +19,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             shape=ft.RoundedRectangleBorder(radius=10),
         ),
         height=40,
-        on_click=lambda e: buscar_cliente(e, get_switch(switch)[0])
+        on_click=lambda e: buscar_cliente(e, )
     )
     botao_buscar_carro = ft.FilledButton(
         text='Buscar',
@@ -31,7 +30,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             shape=ft.RoundedRectangleBorder(radius=10),
         ),
         height=40,
-        on_click=lambda e: buscar_carro(e, get_switch(switch)[0])
+        on_click=lambda e: buscar_carro(e, )
     )
 
     botao_buscar_filial = ft.FilledButton(
@@ -41,7 +40,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             shape=ft.RoundedRectangleBorder(radius=10),
         ),
         height=40,
-        on_click=lambda e: buscar_filial(e, get_switch(switch)[0])
+        on_click=lambda e: buscar_filial(e, )
     )
     botao_criar_aluguel = ft.FilledButton(
         text='Criar Aluguel', color=branco(),

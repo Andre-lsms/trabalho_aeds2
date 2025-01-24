@@ -1,3 +1,5 @@
+from random import shuffle
+
 from faker import Faker
 
 fake = Faker('pt_BR')
@@ -25,7 +27,7 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método imprimir_registro")
 
-    def criar_base(self, tamanho, **kwargs):
+    def criar_base(self, tamanho, desordenada=True, **kwargs):
         arquivo = kwargs.get('arquivo')
 
         if arquivo is None:
@@ -35,7 +37,8 @@ class EntidadeBase:
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
-        # shuffle(codigos)
+        if desordenada:
+            shuffle(codigos)
         for i in range(len(codigos)):
             registro = self.criar_registro(codigos[i], arquivo=arquivo)
             self.salvar_registro(arquivo, registro)
