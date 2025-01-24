@@ -51,13 +51,13 @@ class Filial(EntidadeBase):
             if len(registro_bytes) < self.tamanho_registro():
                 return None
             registro = struct.unpack(self.get_formato(), registro_bytes)
-            cod, nome, endereco, telefone, email = registro
+            cod, nome,email, telefone, endereco  = registro
             return Filial(
                 cod=cod,
                 nome=nome.decode('utf-8').rstrip(chr(0)),
                 email=email.decode('utf-8').rstrip(chr(0)),
                 telefone=telefone.decode('utf-8').rstrip(chr(0)),
-                endereco=endereco.decode('utf-8').rstrip(chr(0))
+                endereco=endereco.decode('utf-8', errors='ignore').rstrip(chr(0)),  # Ignora bytes inválidos
             )
         except struct.error as e:
             print(f"Erro ao desempacotar registro: {e}")

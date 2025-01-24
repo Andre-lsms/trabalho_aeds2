@@ -52,7 +52,6 @@ class Aluguel(EntidadeBase):
         self.diaria = self.fake.random_int(min=100, max=600)
         self.tempo =(datetime.date.today() - self.data_aluguel).days
         self.valor_total = self.diaria * self.tempo
-        print(f'Valor total: {self.valor_total}')
         return Aluguel(
             codigo=self.codigo,
             id_cliente=self.id_cliente,
@@ -143,9 +142,11 @@ class Aluguel(EntidadeBase):
 
     @staticmethod
     def escolher_registro_aleatorio(arquivo, entidade):
-        tamanho = entidade.tamanho_arquivo(arquivo)
-        quant_arquivos = tamanho // entidade.tamanho_registro()
-        posicao = random.randint(0, quant_arquivos - 1)
-        arquivo.seek(posicao * entidade.tamanho_registro())
+        arquivo.seek(0)  # Garante que a leitura comece do início do arquivo
+        tamanho_arquivo = entidade.tamanho_arquivo(arquivo)
+        tamanho_registro = entidade.tamanho_registro()
+        quant_registros = tamanho_arquivo // tamanho_registro
+        posicao = random.randint(0, quant_registros - 1)
+        arquivo.seek(posicao * tamanho_registro)
         registro_lido = entidade.ler_registro(arquivo)
         return registro_lido

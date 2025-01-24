@@ -14,11 +14,10 @@ carros = Carro()
 filiais = Filial()
 alugueis = Aluguel()
 
-clientes.criar_base(100, arquivo=arquivo_cliente)
-carros.criar_base(100, arquivo=arquivo_carro)
-filiais.criar_base(100, arquivo=arquivo_filial)
+clientes.criar_base(10000, arquivo=arquivo_cliente)
+carros.criar_base(10000, arquivo=arquivo_carro)
+filiais.criar_base(10000, arquivo=arquivo_filial)
 
-alugueis.criar_base(100, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
+alugueis.criar_base(10000, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
                     arquivo_filial=arquivo_filial)
-alugueis.imprimir_base(arquivo)
 
