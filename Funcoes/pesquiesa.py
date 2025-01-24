@@ -18,6 +18,7 @@ def pesquisa_sequencial(id,arquivo,entidade):
             print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
             entidade.imprimir(registro)
             return
+    print(f"Registro [{id}] não encontrado")
     return -1
 
 def pesquisa_binaria(id, arquivo, entidade):
@@ -38,7 +39,7 @@ def pesquisa_binaria(id, arquivo, entidade):
             print(f"comparacoes: {comparacoes}")
             print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
             bigo = math.ceil(math.log2(quant_arquivos))
-            print(f'{bigo}')
+            print(f'Pior caso: {bigo}')
             entidade.imprimir(registro)
             return meio
         elif registro.codigo < id:

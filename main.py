@@ -1,12 +1,24 @@
 from Entidades.clientes import Cliente
 from Entidades.carro import Carro
 from Entidades.filial import Filial
+from Entidades.aluguel import Aluguel
 from Funcoes.pesquiesa import *
 
-arquivo = open('Bases/cliente.dat', 'w+b')
+arquivo_cliente = open('Bases/cliente.dat', 'w+b')
+arquivo_carro = open('Bases/carro.dat', 'w+b')
+arquivo_filial = open('Bases/filial.dat', 'w+b')
+arquivo = open('Bases/aluguel.dat', 'w+b')
 
-carro = Cliente()
-carro.criar_base(10, arquivo=arquivo)
-# pesquisa_sequencial(6,arquivo,carro)
-pesquisa_binaria(5,arquivo,carro)
-arquivo.close()
+clientes = Cliente()
+carros = Carro()
+filiais = Filial()
+alugueis = Aluguel()
+
+clientes.criar_base(1, arquivo=arquivo_cliente)
+carros.criar_base(1, arquivo=arquivo_carro)
+filiais.criar_base(1, arquivo=arquivo_filial)
+
+alugueis.criar_base(1, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
+                    arquivo_filial=arquivo_filial)
+alugueis.imprimir_base(arquivo)
+

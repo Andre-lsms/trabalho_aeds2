@@ -1,6 +1,4 @@
-import struct
 from faker import Faker
-from random import shuffle
 
 fake = Faker('pt_BR')
 
@@ -14,8 +12,6 @@ class EntidadeBase:
 
     def salvar_registro(self, arquivo, registro):
         raise NotImplementedError("Subclasses devem implementar o método criar_registro")
-
-        arquivo.seek(0, 2)
 
     def ler_registro(self, arquivo):
         """
@@ -31,6 +27,7 @@ class EntidadeBase:
 
     def criar_base(self, tamanho, **kwargs):
         arquivo = kwargs.get('arquivo')
+
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
 
@@ -40,7 +37,7 @@ class EntidadeBase:
             codigos.append(i + 1)
         # shuffle(codigos)
         for i in range(len(codigos)):
-            registro = self.criar_registro(codigos[i])
+            registro = self.criar_registro(codigos[i], arquivo=arquivo)
             self.salvar_registro(arquivo, registro)
 
     def imprimir_base(self, arquivo):
@@ -52,10 +49,14 @@ class EntidadeBase:
     def tamanho_registro(self):
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
 
-    def tamanho_arquivo(self, arquivo):
-        arquivo.seek(0,2)
+    @staticmethod
+    def tamanho_arquivo(arquivo):
+        arquivo.seek(0, 2)
         tamanho = arquivo.tell()
         return int(tamanho)
+
+    def quantidade_registros(self, arquivo):
+        return self.tamanho_arquivo(arquivo) // self.tamanho_registro()
 
     def get_formato(self):
         """

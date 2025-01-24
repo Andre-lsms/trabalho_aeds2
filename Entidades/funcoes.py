@@ -6,7 +6,7 @@ from faker import Faker
 fake = Faker('pt_BR')
 
 
-def escolher_registro(arquivo, entidade, posicao = None):
+def escolher_registro(arquivo, entidade, posicao=None):
     quantidade = (tamanho_arquivo(arquivo) // tamanho_registro(entidade))
     if posicao is None:
         posicao = fake.random_int(min=0, max=quantidade - 1)
@@ -49,16 +49,16 @@ def pesquisa_binaria(id, arquivo, entidade):
     total_registros = tamanho // tamanho_registro(entidade)
     inicio = 0
     fim = total_registros - 1
-    comparações = 0
+    comparacoes = 0
     arquivo.seek(0)
     while inicio <= fim:
         meio = (inicio + fim) // 2
         arquivo.seek(meio * tamanho_registro(entidade))
         registro = entidade.ler_registro(arquivo)
-        comparações += 1
+        comparacoes += 1
         if registro[0] == id:
             print(f"Registro [{id}] encontrado")
-            print(f"Comparações: {comparações}")
+            print(f"comparacoes: {comparacoes}")
             bigo = math.ceil(math.log2(total_registros))
             print(f'{bigo}')
             entidade.imprimir_registro(registro)
@@ -108,7 +108,7 @@ def pesquisa_binaria(id, arquivo, entidade):
                     file.write(f'\nData de Nascimento: {funcLido.dataNascimento.decode("utf-8").strip()}')
                     file.write(f'\nSalário: {funcLido.salario}')
                     file.write('\n**********************************************')
-                    file.write(f'\nNúmero de comparações: {comparacoes}')
+                    file.write(f'\nNúmero de comparacoes: {comparacoes}')
                     file.write(f'\nTempo de execução: {(time() - tincio) * 1000:.2f} ms\n')
                     file.write('\n**********************************************')
 
@@ -127,7 +127,7 @@ def pesquisa_binaria(id, arquivo, entidade):
         with open(arquivo_log, 'a') as file:
             file.write('\n***********************BUSCA BINÁRIA***********************')
             file.write(f'\nFuncionário de código {chave} não encontrado.')
-            file.write(f'\nNúmero de comparações: {comparacoes}')
+            file.write(f'\nNúmero de comparacoes: {comparacoes}')
             file.write(f'\nTempo de execução: {(time() - tincio) * 1000:.2f} ms\n')
         return False
 '''

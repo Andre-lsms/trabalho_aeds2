@@ -6,7 +6,7 @@ import random
 
 
 class Carro(EntidadeBase):
-    def __init__(self, cod=0, placa=None, marca=None, modelo=None, cor=None, ano=0):
+    def __init__(self, cod=0, placa=None, marca=None, modelo=None, cor=None, ano=0, disponivel=None):
         super().__init__()
         self.codigo = cod
         self.placa = placa
@@ -14,6 +14,7 @@ class Carro(EntidadeBase):
         self.modelo = modelo
         self.cor = cor
         self.ano = ano
+        self.disponivel = disponivel
 
     def criar_registro(self, codigo, **kwargs):
         self.codigo = codigo
@@ -22,14 +23,15 @@ class Carro(EntidadeBase):
         self.modelo = kwargs.get('modelo'[:30], random.choice(marcas_modelos[self.marca])[:30])
         self.cor = kwargs.get('cor'[:15], (random.choice(cores))[:15])
         self.ano = kwargs.get('ano', self.fake.random_int(min=2015, max=2025))
+        self.disponivel = kwargs.get('disponivel', True)
         return Carro(
             cod=codigo,
             placa=self.placa,
-
             marca=self.marca,
             modelo=self.modelo,
             cor=self.cor,
-            ano=self.ano
+            ano=self.ano,
+            disponivel=self.disponivel
         )
 
     def salvar_registro(self, arquivo, registro):
@@ -40,6 +42,8 @@ class Carro(EntidadeBase):
             arquivo.write(struct.pack('30s', registro.modelo.encode('utf-8')))
             arquivo.write(struct.pack('15s', registro.cor.encode('utf-8')))
             arquivo.write(struct.pack('i', registro.ano))
+            arquivo.write(struct.pack('?', registro.disponivel))
+
         except struct.error as e:
             print(f"Erro ao empacotar registro: {e}")
 
@@ -51,6 +55,7 @@ class Carro(EntidadeBase):
         print(f"Modelo: {registro.modelo.strip()}")
         print(f"Cor: {registro.cor.strip()}")
         print(f"Ano: {registro.ano}")
+        print(f"Disponível: {registro.disponivel}")
         print(f'{96 * "_"}')
 
     def ler_registro(self, arquivo):
@@ -60,20 +65,22 @@ class Carro(EntidadeBase):
                 return None
 
             registro = struct.unpack(self.get_formato(), registro_bytes)
-            cod, placa, marca, modelo, cor, ano = registro
+            cod, placa, marca, modelo, cor, ano, disponivel = registro
             return Carro(
                 cod=cod,
                 placa=placa.decode('utf-8').rstrip(chr(0)),
                 marca=marca.decode('utf-8').rstrip(chr(0)),
                 modelo=modelo.decode('utf-8').rstrip(chr(0)),
                 cor=cor.decode('utf-8').rstrip(chr(0)),
-                ano=ano
+                ano=ano,
+                disponivel=disponivel
             )
         except struct.error as e:
             print(f"Erro ao desempacotar registro: {e}")
 
     def get_formato(self):
-        return '=i7s30s30s15si'
+        return '=i7s30s30s15si?'
+
     def tamanho_registro(self):
         return int(struct.calcsize(self.get_formato()))
 
