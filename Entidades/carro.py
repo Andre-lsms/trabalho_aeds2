@@ -1,31 +1,88 @@
+import struct
+
 from Entidades.entidade_base import EntidadeBase
 
 import random
 
 
 class Carro(EntidadeBase):
-    @classmethod
-    def get_formato(cls):
-        # Define o formato do registro para Carro
-        return '=i7s30s30s15sH'
+    def __init__(self, cod=0, placa=None, marca=None, modelo=None, cor=None, ano=0, disponivel=None):
+        super().__init__()
+        self.codigo = cod
+        self.placa = placa
+        self.marca = marca
+        self.modelo = modelo
+        self.cor = cor
+        self.ano = ano
+        self.disponivel = disponivel
 
-    def criar_registro(self, cod, **kwargs):
-        codigo = cod
-        placa = kwargs.get('placa'[:7], (self.fake.numerify(text='###-####'))[:7])
-        marca = kwargs.get('marca'[:30], random.choice(list(marcas_modelos.keys()))[:30])
-        modelo = kwargs.get('modelo'[:30], random.choice(marcas_modelos[marca])[:30])
-        cor = kwargs.get('cor'[:15], (random.choice(cores))[:15])
-        ano = kwargs.get('ano', self.fake.random_int(min=2015, max=2025))
-        return codigo, placa.encode('utf-8'), marca.encode('utf-8'), modelo.encode('utf-8'), cor.encode('utf-8'), ano
+    def criar_registro(self, codigo, **kwargs):
+        self.codigo = codigo
+        self.placa = kwargs.get('placa'[:7], (self.fake.numerify(text='###-####'))[:7])
+        self.marca = kwargs.get('marca'[:30], random.choice(list(marcas_modelos.keys()))[:30])
+        self.modelo = kwargs.get('modelo'[:30], random.choice(marcas_modelos[self.marca])[:30])
+        self.cor = kwargs.get('cor'[:15], (random.choice(cores))[:15])
+        self.ano = kwargs.get('ano', self.fake.random_int(min=2015, max=2025))
+        self.disponivel = kwargs.get('disponivel', True)
+        return Carro(
+            cod=codigo,
+            placa=self.placa,
+            marca=self.marca,
+            modelo=self.modelo,
+            cor=self.cor,
+            ano=self.ano,
+            disponivel=self.disponivel
+        )
 
-    def imprimir_registro(self, registro,saida):
-        saida.write(f"Codigo: [{registro[0]}]")
-        saida.write(f"Placa: {registro[1].decode('utf-8').rstrip(chr(0))}")
-        saida.write(f"Marca: {registro[2].decode('utf-8').rstrip(chr(0))}")
-        saida.write(f"Modelo: {registro[3].decode('utf-8').rstrip(chr(0))}")
-        saida.write(f"Cor: {registro[4].decode('utf-8').rstrip(chr(0))}")
-        saida.write(f"Ano: {registro[5]}")
-        saida.write(f'{95 * "_"}')
+    def salvar_registro(self, arquivo, registro):
+        try:
+            arquivo.write(struct.pack('i', registro.codigo))
+            arquivo.write(struct.pack('7s', registro.placa.encode('utf-8')))
+            arquivo.write(struct.pack('30s', registro.marca.encode('utf-8')))
+            arquivo.write(struct.pack('30s', registro.modelo.encode('utf-8')))
+            arquivo.write(struct.pack('15s', registro.cor.encode('utf-8')))
+            arquivo.write(struct.pack('i', registro.ano))
+            arquivo.write(struct.pack('?', registro.disponivel))
+
+        except struct.error as e:
+            print(f"Erro ao empacotar registro: {e}")
+
+    def imprimir(self, registro):
+        print(f'{95 * "_"}')
+        print(f"Código: {registro.codigo}")
+        print(f"Placa: {registro.placa.strip()}")
+        print(f"Marca: {registro.marca.strip()}")
+        print(f"Modelo: {registro.modelo.strip()}")
+        print(f"Cor: {registro.cor.strip()}")
+        print(f"Ano: {registro.ano}")
+        print(f"Disponível: {registro.disponivel}")
+        print(f'{96 * "_"}')
+
+    def ler_registro(self, arquivo):
+        try:
+            registro_bytes = arquivo.read(self.tamanho_registro())
+            if len(registro_bytes) < self.tamanho_registro():
+                return None
+
+            registro = struct.unpack(self.get_formato(), registro_bytes)
+            cod, placa, marca, modelo, cor, ano, disponivel = registro
+            return Carro(
+                cod=cod,
+                placa=placa.decode('utf-8').rstrip(chr(0)),
+                marca=marca.decode('utf-8').rstrip(chr(0)),
+                modelo=modelo.decode('utf-8').rstrip(chr(0)),
+                cor=cor.decode('utf-8').rstrip(chr(0)),
+                ano=ano,
+                disponivel=disponivel
+            )
+        except struct.error as e:
+            print(f"Erro ao desempacotar registro: {e}")
+
+    def get_formato(self):
+        return '=i7s30s30s15si?'
+
+    def tamanho_registro(self):
+        return int(struct.calcsize(self.get_formato()))
 
 
 marcas_modelos = {
