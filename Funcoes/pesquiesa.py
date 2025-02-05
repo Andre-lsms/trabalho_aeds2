@@ -2,10 +2,9 @@ import math
 from time import time
 
 
-
-def pesquisa_sequencial(id,arquivo,entidade):
+def pesquisa_sequencial(id, arquivo, entidade, log):
     tamanho = entidade.tamanho_arquivo(arquivo)
-    quant_arquivos = tamanho//entidade.tamanho_registro()
+    quant_arquivos = tamanho // entidade.tamanho_registro()
     arquivo.seek(0)
     t_inicio = time()
     comparacoes = 0
@@ -13,15 +12,16 @@ def pesquisa_sequencial(id,arquivo,entidade):
         registro = entidade.ler_registro(arquivo)
         comparacoes += 1
         if registro.codigo == id:
-            print(f"Registro [{id}]encontrado")
-            print(f"comparacoes: {comparacoes}")
-            print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
-            entidade.imprimir(registro)
-            return
-    print(f"Registro [{id}] não encontrado")
+            log.write('\n' +95*"_")
+            log.write(f"\nRegistro [{id}]encontrado - [Busca Sequencial =={entidade.nome_classe}==]")
+            log.write(f"\ncomparacoes: {comparacoes}")
+            log.write(f"\nTempo: {(time() - t_inicio) * 1000:.2f}ms")
+            return registro
+    log.write(f"Registro [{id}] não encontrado")
     return -1
 
-def pesquisa_binaria(id, arquivo, entidade):
+
+def pesquisa_binaria(id, arquivo, entidade, log):
     tamanho = entidade.tamanho_arquivo(arquivo)
     quant_arquivos = tamanho // entidade.tamanho_registro()
     t_inicio = time()
@@ -35,13 +35,13 @@ def pesquisa_binaria(id, arquivo, entidade):
         registro = entidade.ler_registro(arquivo)
         comparacoes += 1
         if registro.codigo == id:
-            print(f"Registro [{id}] encontrado")
-            print(f"comparacoes: {comparacoes}")
-            print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
+            log.write('\n' + 95 * "_")
+            log.write(f"\nRegistro [{id}] encontrado - [Busca Binária =={entidade.nome_classe}==]")
+            log.write(f"\ncomparacoes: {comparacoes}")
+            log.write(f"\nTempo: {(time() - t_inicio) * 1000:.2f}ms")
             bigo = math.ceil(math.log2(quant_arquivos))
-            print(f'Pior caso: {bigo}')
-            entidade.imprimir(registro)
-            return meio
+            log.write(f'\nPior caso: {bigo}')
+            return registro
         elif registro.codigo < id:
             inicio = meio + 1
         else:

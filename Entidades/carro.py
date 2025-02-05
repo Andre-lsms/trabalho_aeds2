@@ -6,9 +6,10 @@ import random
 
 
 class Carro(EntidadeBase):
-    def __init__(self, cod=0, placa=None, marca=None, modelo=None, cor=None, ano=0, disponivel=None):
+    def __init__(self, codigo=0, placa=None, marca=None, modelo=None, cor=None, ano=0, disponivel=None):
         super().__init__()
-        self.codigo = cod
+        self.nome_classe = 'Carro'
+        self.codigo = codigo
         self.placa = placa
         self.marca = marca
         self.modelo = modelo
@@ -16,7 +17,7 @@ class Carro(EntidadeBase):
         self.ano = ano
         self.disponivel = disponivel
 
-    def criar_registro(self, codigo, **kwargs):
+    def criar_registro(self, codigo=0, **kwargs):
         self.codigo = codigo
         self.placa = kwargs.get('placa'[:7], (self.fake.numerify(text='###-####'))[:7])
         self.marca = kwargs.get('marca'[:30], random.choice(list(marcas_modelos.keys()))[:30])
@@ -25,7 +26,7 @@ class Carro(EntidadeBase):
         self.ano = kwargs.get('ano', self.fake.random_int(min=2015, max=2025))
         self.disponivel = kwargs.get('disponivel', True)
         return Carro(
-            cod=codigo,
+            codigo=codigo,
             placa=self.placa,
             marca=self.marca,
             modelo=self.modelo,
@@ -47,16 +48,15 @@ class Carro(EntidadeBase):
         except struct.error as e:
             print(f"Erro ao empacotar registro: {e}")
 
-    def imprimir(self, registro):
-        print(f'{95 * "_"}')
-        print(f"Código: {registro.codigo}")
-        print(f"Placa: {registro.placa.strip()}")
-        print(f"Marca: {registro.marca.strip()}")
-        print(f"Modelo: {registro.modelo.strip()}")
-        print(f"Cor: {registro.cor.strip()}")
-        print(f"Ano: {registro.ano}")
-        print(f"Disponível: {registro.disponivel}")
-        print(f'{96 * "_"}')
+    def imprimir(self, registro, log):
+
+        log.write(f"Código: {registro.codigo}\n"
+                  f"Placa: {registro.placa.strip()}\n"
+                  f"Marca: {registro.marca.strip()}\n"
+                  f"Modelo: {registro.modelo.strip()}\n"
+                  f"Cor: {registro.cor.strip()}\n"
+                  f"Ano: {registro.ano}\n"
+                  f"Disponível: {'Disponível' if registro.disponivel else 'Não disponível'}\n")
 
     def ler_registro(self, arquivo):
         try:
@@ -65,13 +65,13 @@ class Carro(EntidadeBase):
                 return None
 
             registro = struct.unpack(self.get_formato(), registro_bytes)
-            cod, placa, marca, modelo, cor, ano, disponivel = registro
+            codigo, placa, marca, modelo, cor, ano, disponivel = registro
             return Carro(
-                cod=cod,
-                placa=placa.decode('utf-8').rstrip(chr(0)),
-                marca=marca.decode('utf-8').rstrip(chr(0)),
-                modelo=modelo.decode('utf-8').rstrip(chr(0)),
-                cor=cor.decode('utf-8').rstrip(chr(0)),
+                codigo=codigo,
+                placa=placa.decode('utf-8', errors='ignore').rstrip(chr(0)),
+                marca=marca.decode('utf-8', errors='ignore').rstrip(chr(0)),
+                modelo=modelo.decode('utf-8', errors='ignore').rstrip(chr(0)),
+                cor=cor.decode('utf-8', errors='ignore').rstrip(chr(0)),
                 ano=ano,
                 disponivel=disponivel
             )
@@ -84,6 +84,11 @@ class Carro(EntidadeBase):
     def tamanho_registro(self):
         return int(struct.calcsize(self.get_formato()))
 
+    def exibir_disponiveis(self, arquivo, saida):
+        arquivo.seek(0)
+        while registro_lido := self.ler_registro(arquivo):
+            if registro_lido is not None and registro_lido.disponivel:
+                saida.write(f"[{registro_lido.codigo}]  {registro_lido.marca} - {registro_lido.modelo},{registro_lido.cor}, {registro_lido.ano}")
 
 marcas_modelos = {
     "Toyota": ["Corolla", "Hilux", "Yaris"],
