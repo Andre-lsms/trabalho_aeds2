@@ -4,8 +4,7 @@ from time import time
 
 
 def pesquisa_sequencial(id,arquivo,entidade):
-    tamanho = entidade.tamanho_arquivo(arquivo)
-    quant_arquivos = tamanho//entidade.tamanho_registro()
+    quant_arquivos = entidade.quantidade_registros(arquivo)
     arquivo.seek(0)
     t_inicio = time()
     comparacoes = 0
