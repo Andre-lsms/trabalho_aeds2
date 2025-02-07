@@ -22,7 +22,7 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método ler_registro")
 
-    def imprimir(self, registro,cx_log):
+    def imprimir(self, registro, cx_log):
         """
         Subclasses devem implementar este método para imprimir o registro.
         """
@@ -44,11 +44,11 @@ class EntidadeBase:
             registro = self.criar_registro(codigos[i], arquivo=arquivo)
             self.salvar_registro(arquivo, registro)
 
-    def imprimir_base(self, arquivo,log):
+    def imprimir_base(self, arquivo, log):
         arquivo.seek(0)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
-                self.imprimir(registro_lido,log)
+                self.imprimir(registro_lido, log)
 
     def tamanho_registro(self):
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
@@ -68,14 +68,13 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método get_formato")
 
-    def sobrescrever(self,arquivo, registro):
+    def sobrescrever(self, arquivo, registro):
         posicao = arquivo.tell()
         tamanho_registro = registro.tamanho_registro()
         arquivo.seek(posicao - tamanho_registro)
         registro.salvar_registro(arquivo, registro)
 
     from random import shuffle
-
 
     def desordenar_base(self, arquivo):
         # Lê todos os registros do arquivo e armazena em uma lista
@@ -115,7 +114,7 @@ class EntidadeBase:
         for registro in registros:
             self.salvar_registro(arquivo, registro)  # Salva corretamente cada registro
 
-        print(f"Base ordenada com sucesso! tempo de execução:{time.time()-t_inicio} ")
+        print(f"Base ordenada com sucesso! tempo de execução:{time.time() - t_inicio} ")
 
     # def ordenar_base(self, arquivo):
     #     # Lê todos os registros do arquivo e armazena em uma lista

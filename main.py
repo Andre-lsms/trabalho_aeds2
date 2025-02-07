@@ -30,13 +30,13 @@ registro_filial = []
 registro_aluguel = []
 t_inicio = time.time()
 tam = 100000
-# cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
-# carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
-# filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
-# aluguel.criar_base(tam, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
-#                    arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
-#                    arquivo_log=arquivo_log)
-# print("Tempo de criação dos arquivos: ", time.time() - t_inicio)
+cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
+carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
+filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
+aluguel.criar_base(90000, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
+                   arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
+                   arquivo_log=arquivo_log)
+print("Tempo de criação dos arquivos: ", time.time() - t_inicio)
 
 
 def main(page: ft.Page):

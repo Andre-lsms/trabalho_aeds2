@@ -1,0 +1,61 @@
+
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 44382
+Tempo: 137.62ms
+_______________________________________________________________________________________________
+Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 23586
+Tempo: 49.60ms
+_______________________________________________________________________________________________
+Registro [87640]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 77327
+Tempo: 135.57ms
+_______________________________________________________________________________________________
+Registro [51244]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 46430
+Tempo: 77.60ms
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 1
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 6176
+Tempo: 25.00ms
+_______________________________________________________________________________________________
+Registro [87640]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 87640
+Tempo: 154.09ms
+_______________________________________________________________________________________________
+Registro [51244]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 51244
+Tempo: 87.54ms
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 1
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 6176
+Tempo: 25.02ms
+_______________________________________________________________________________________________
+Registro [87640]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 87640
+Tempo: 184.40ms
+_______________________________________________________________________________________________
+Registro [51244]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 51244
+Tempo: 89.98ms
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 1
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [2]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 2
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [457]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 457
+Tempo: 3.55ms
