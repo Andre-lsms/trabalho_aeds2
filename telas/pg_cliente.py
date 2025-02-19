@@ -11,6 +11,8 @@ registro = None
 
 def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesquisa):
     loading_dialog = loading()
+    page.dialog = loading_dialog
+    loading_dialog.open = False
 
     caixa_pesquisa = ft.TextField(
         label='Código do aluguel',
@@ -183,58 +185,52 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
         e.page.update()
 
     def busca(e, t_busca, log):
-        page.dialog = loading_dialog
-        loading_dialog.open = True
-        page.update()
-        global registro
-        try:
-            id = int(caixa_pesquisa.value)
-            if t_busca == 'Sequencial':
-                registro = pesquisa_sequencial(id, arquivo_cliente, cliente, log)
-            else:
-                registro = pesquisa_binaria(id, arquivo_cliente, cliente, log)
-            if registro == -1:
-                loading_dialog.open = False
-                page.update()
-                caixa_nome_cliente.value = ''
-                caixa_idade_cliente.value = ''
-                caixa_cpf_cliente.value = ''
-                caixa_endereco_cliente.value = ''
-                caixa_telefone_cliente.value = ''
-                caixa_email_cliente.value = ''
-                page.add(alert(mensagem="Aluguel Não Encontrado", icone="ERROR"))
-
-            else:
-                loading_dialog.open = False
-                page.update()
-                caixa_id_cliente.disabled = True
-                caixa_idade_cliente.disabled = True
-                caixa_nome_cliente.disabled = True
-                caixa_cpf_cliente.disabled = True
-                caixa_endereco_cliente.disabled = True
-                caixa_telefone_cliente.disabled = True
-                caixa_email_cliente.disabled = True
-                botao_editar.visible = True
-                botao_cancelar.text = 'Voltar'
-                botao_cancelar.on_click = lambda e: cancelar_edicao(e)
-                botao_cadastrar.visible = False
-                caixa_pesquisa.label = 'Cliente encontrado'
-                caixa_id_cliente.value = registro.codigo
-
-                caixa_nome_cliente.value = registro.nome
-                caixa_idade_cliente.value = registro.idade
-                caixa_cpf_cliente.value = registro.cpf
-                caixa_email_cliente.value = registro.email
-                caixa_telefone_cliente.value = registro.telefone
-                caixa_endereco_cliente.value = registro.endereco
-
-        except ValueError:
-            loading_dialog.open = False
+        if caixa_id_cliente.value != '':
+            loading_dialog.open = True
             page.update()
-            caixa_pesquisa.label = 'Digite um número'
-            page.add(alert(mensagem="Digite um numero", icone="ERROR"))
-        e.page.update()
+            global registro
+            try:
+                id = int(caixa_pesquisa.value)
+                if t_busca == 'Sequencial':
+                    registro = pesquisa_sequencial(id, arquivo_cliente, cliente, log)
+                else:
+                    registro = pesquisa_binaria(id, arquivo_cliente, cliente, log)
+                if registro == -1:
+                    caixa_nome_cliente.value = ''
+                    caixa_idade_cliente.value = ''
+                    caixa_cpf_cliente.value = ''
+                    caixa_endereco_cliente.value = ''
+                    caixa_telefone_cliente.value = ''
+                    caixa_email_cliente.value = ''
+                    page.add(alert(mensagem="Aluguel Não Encontrado", icone="ERROR"))
 
+                else:
+                    caixa_id_cliente.disabled = True
+                    caixa_idade_cliente.disabled = True
+                    caixa_nome_cliente.disabled = True
+                    caixa_cpf_cliente.disabled = True
+                    caixa_endereco_cliente.disabled = True
+                    caixa_telefone_cliente.disabled = True
+                    caixa_email_cliente.disabled = True
+                    botao_editar.visible = True
+                    botao_cancelar.text = 'Voltar'
+                    botao_cancelar.on_click = lambda e: cancelar_edicao(e)
+                    botao_cadastrar.visible = False
+                    caixa_pesquisa.label = 'Cliente encontrado'
+                    caixa_id_cliente.value = registro.codigo
+                    caixa_nome_cliente.value = registro.nome
+                    caixa_idade_cliente.value = registro.idade
+                    caixa_cpf_cliente.value = registro.cpf
+                    caixa_email_cliente.value = registro.email
+                    caixa_telefone_cliente.value = registro.telefone
+                    caixa_endereco_cliente.value = registro.endereco
+
+            except ValueError:
+                caixa_pesquisa.label = 'Digite um número'
+                page.add(alert(mensagem="Digite um numero", icone="ERROR"))
+            finally:
+                loading_dialog.open = False
+                page.update()
     def salvar_edicao(e):
         posicao = arquivo_cliente.tell() - cliente.tamanho_registro()
         arquivo_cliente.seek(posicao)
@@ -261,12 +257,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
         page.add(alert(mensagem="Cliente editado com sucesso", icone="CHECK", cor=fundo_neutro()))
 
     def cancelar_edicao(e):
-        # caixa_idade_cliente.bgcolor = fundo_neutro()
-        # caixa_nome_cliente.bgcolor = fundo_neutro()
-        # caixa_cpf_cliente.bgcolor = fundo_neutro()
-        # caixa_endereco_cliente.bgcolor = fundo_neutro()
-        # caixa_telefone_cliente.bgcolor = fundo_neutro()
-        # caixa_email_cliente.bgcolor = fundo_neutro()
+
         botao_cancelar.visible = False
         caixa_idade_cliente.value = ''
         caixa_nome_cliente.value = ''

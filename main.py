@@ -22,21 +22,26 @@ arquivo_cliente = open('Bases/cliente.dat', "r+b")
 arquivo_carro = open('Bases/carro.dat', "r+b")
 arquivo_filial = open('Bases/filial.dat', "r+b")
 arquivo_aluguel = open('Bases/aluguei.dat', "r+b")
-arquivo_log = open('Bases/log.txt', "w+")
+arquivo_log = open('Bases/log.txt', "a+")
+# arquivo_cliente = open('Bases/cliente.dat', "w+b")
+# arquivo_carro = open('Bases/carro.dat', "w+b")
+# arquivo_filial = open('Bases/filial.dat', "w+b")
+# arquivo_aluguel = open('Bases/aluguei.dat', "w+b")
+# arquivo_log = open('Bases/log.txt', "w+")
 
 registro_cliente = []
 registro_carro = []
 registro_filial = []
 registro_aluguel = []
-t_inicio = time.time()
-tam = 100000
-cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
-carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
-filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
-aluguel.criar_base(90000, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
-                   arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
-                   arquivo_log=arquivo_log)
-print("Tempo de criação dos arquivos: ", time.time() - t_inicio)
+# t_inicio = time.time()
+# tam = 100000
+# cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
+# carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
+# filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
+# aluguel.criar_base(90000, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
+#                    arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
+#                    arquivo_log=arquivo_log)
+# print("Tempo de criação dos arquivos: ", time.time() - t_inicio)
 
 
 def main(page: ft.Page):
@@ -144,7 +149,7 @@ def main(page: ft.Page):
         elif index == 3:
             content_container.controls.extend(data_page(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
                                                         arquivo_carro, carro, arquivo_filial, filial,
-                                                        arquivo_log, dados_ordenados=config.dados_ordenados))
+                                                        arquivo_log,))
         page.update()
 
     page.add(

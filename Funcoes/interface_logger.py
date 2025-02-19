@@ -45,11 +45,3 @@ class InterfaceLogger:
 
         self.text_widget.update()
 
-    def exportar_log(self, caminho="log.txt"):
-        """Salva todo o histórico em um arquivo de texto."""
-        with open(caminho, "w", encoding="utf-8") as f:
-            for item in self.historico:
-                if isinstance(item, ft.Text):  # Apenas mensagens, sem divisores
-                    f.write(item.value + "\n")
-
-        print(f"Log salvo em {caminho}")

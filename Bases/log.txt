@@ -1,61 +1,121 @@
 
 _______________________________________________________________________________________________
 Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
-comparacoes: 44382
-Tempo: 137.62ms
-_______________________________________________________________________________________________
-Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
-comparacoes: 23586
-Tempo: 49.60ms
-_______________________________________________________________________________________________
-Registro [87640]encontrado - [Busca Sequencial ==Carro==]
-comparacoes: 77327
-Tempo: 135.57ms
-_______________________________________________________________________________________________
-Registro [51244]encontrado - [Busca Sequencial ==Filial==]
-comparacoes: 46430
-Tempo: 77.60ms
-_______________________________________________________________________________________________
-Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
 comparacoes: 1
-Tempo: 0.00ms
+Tempo: 0.99ms
 _______________________________________________________________________________________________
-Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
-comparacoes: 6176
-Tempo: 25.00ms
+Registro [34171]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 34171
+Tempo: 71.57ms
 _______________________________________________________________________________________________
-Registro [87640]encontrado - [Busca Sequencial ==Carro==]
-comparacoes: 87640
-Tempo: 154.09ms
+Registro [86350]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 86349
+Tempo: 151.58ms
 _______________________________________________________________________________________________
-Registro [51244]encontrado - [Busca Sequencial ==Filial==]
-comparacoes: 51244
-Tempo: 87.54ms
+Registro [99640]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 99640
+Tempo: 170.18ms
 _______________________________________________________________________________________________
-Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
-comparacoes: 1
-Tempo: 0.00ms
-_______________________________________________________________________________________________
-Registro [6176]encontrado - [Busca Sequencial ==Cliente==]
-comparacoes: 6176
-Tempo: 25.02ms
-_______________________________________________________________________________________________
-Registro [87640]encontrado - [Busca Sequencial ==Carro==]
-comparacoes: 87640
-Tempo: 184.40ms
-_______________________________________________________________________________________________
-Registro [51244]encontrado - [Busca Sequencial ==Filial==]
-comparacoes: 51244
-Tempo: 89.98ms
-_______________________________________________________________________________________________
-Registro [1]encontrado - [Busca Sequencial ==Cliente==]
-comparacoes: 1
-Tempo: 0.00ms
-_______________________________________________________________________________________________
-Registro [2]encontrado - [Busca Sequencial ==Carro==]
+Registro [2]encontrado - [Busca Sequencial ==Aluguel==]
 comparacoes: 2
 Tempo: 0.00ms
 _______________________________________________________________________________________________
-Registro [457]encontrado - [Busca Sequencial ==Carro==]
-comparacoes: 457
-Tempo: 3.55ms
+Registro [76663]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 76663
+Tempo: 165.64ms
+_______________________________________________________________________________________________
+Registro [76536]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 76535
+Tempo: 131.80ms
+_______________________________________________________________________________________________
+Registro [39113]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 39113
+Tempo: 65.01ms
+_______________________________________________________________________________________________
+Registro [1] encontrado - [Busca Binária ==Aluguel==]
+comparacoes: 16
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [34171] encontrado - [Busca Binária ==Cliente==]
+comparacoes: 17
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [86350] encontrado - [Busca Binária ==Carro==]
+comparacoes: 16
+Tempo: 1.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [99640] encontrado - [Busca Binária ==Filial==]
+comparacoes: 14
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [2] encontrado - [Busca Binária ==Aluguel==]
+comparacoes: 15
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [76663] encontrado - [Busca Binária ==Cliente==]
+comparacoes: 16
+Tempo: 0.98ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [76536] encontrado - [Busca Binária ==Carro==]
+comparacoes: 16
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [39113] encontrado - [Busca Binária ==Filial==]
+comparacoes: 15
+Tempo: 0.00ms
+Pior caso: 17
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 1
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [34171]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 34171
+Tempo: 66.60ms
+_______________________________________________________________________________________________
+Registro [86350]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 86349
+Tempo: 147.39ms
+_______________________________________________________________________________________________
+Registro [99640]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 99640
+Tempo: 165.86ms
+_______________________________________________________________________________________________
+Registro [2]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 2
+Tempo: 0.00ms
+_______________________________________________________________________________________________
+Registro [76663]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 76663
+Tempo: 162.66ms
+_______________________________________________________________________________________________
+Registro [76536]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 76535
+Tempo: 137.51ms
+_______________________________________________________________________________________________
+Registro [39113]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 39113
+Tempo: 66.98ms
+_______________________________________________________________________________________________
+Registro [1]encontrado - [Busca Sequencial ==Aluguel==]
+comparacoes: 1
+Tempo: 1.00ms
+_______________________________________________________________________________________________
+Registro [34171]encontrado - [Busca Sequencial ==Cliente==]
+comparacoes: 34171
+Tempo: 68.50ms
+_______________________________________________________________________________________________
+Registro [86350]encontrado - [Busca Sequencial ==Carro==]
+comparacoes: 86349
+Tempo: 150.02ms
+_______________________________________________________________________________________________
+Registro [99640]encontrado - [Busca Sequencial ==Filial==]
+comparacoes: 99640
+Tempo: 166.13ms
