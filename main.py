@@ -31,19 +31,38 @@ filiais.criar_base(tam, arquivo=arquivo_filial)
 
 alugueis.criar_base(tam, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
                     arquivo_filial=arquivo_filial,desordenada=False)
+# #
+# reg1 = Funcoes.pesquiesa.pesquisa_sequencial(1, arquivo, alugueis)
+# alugueis.excluir_registro(arquivo,reg1)
+# reg2 = Funcoes.pesquiesa.pesquisa_sequencial(3, arquivo, alugueis)
+# alugueis.excluir_registro(arquivo,reg2)
 #
-reg1 = Funcoes.pesquiesa.pesquisa_sequencial(1, arquivo, alugueis)
-alugueis.excluir_registro(arquivo,reg1)
-reg2 = Funcoes.pesquiesa.pesquisa_sequencial(3, arquivo, alugueis)
-alugueis.excluir_registro(arquivo,reg2)
+#
+# #
+# #
+# #
+# alugu = alugueis.criar_registro(123, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
+# alugueis.adicionar_registro(arquivo, alugu)
+# alugu2 = alugueis.criar_registro(124, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
+# alugueis.adicionar_registro(arquivo, alugu2)
+# alugueis.ordenar_base(arquivo)
+# alugueis.imprimir_base(arquivo)
 
+clientes.ordenar_base(arquivo_cliente)
+filiais.ordenar_base(arquivo_filial)
+carros.ordenar_base(arquivo_carro)
+alugueis.ordenar_base(arquivo)
 
-#
-#
-#
-alugu = alugueis.criar_registro(123, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
-alugueis.salvar_registro(arquivo, alugu)
-alugu2 = alugueis.criar_registro(124, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
-alugueis.salvar_registro(arquivo, alugu2)
+clientes.desordenar_base(arquivo_cliente)
+filiais.desordenar_base(arquivo_filial)
+carros.desordenar_base(arquivo_carro)
+alugueis.desordenar_base(arquivo)
+
+clientes.imprimir_base(arquivo_cliente)
+filiais.imprimir_base(arquivo_filial)
+carros.imprimir_base(arquivo_carro)
 alugueis.imprimir_base(arquivo)
+
+
+
 

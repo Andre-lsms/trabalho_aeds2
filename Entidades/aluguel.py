@@ -14,7 +14,8 @@ c_carros = Carro()
 
 class Aluguel(EntidadeBase):
 
-    def __init__(self, marcador=None,rnn_proximo = 0, codigo=0, cliente: Cliente = None, carro: Carro = None, filial: Filial = None,
+    def __init__(self, marcador=None, rnn_proximo=0, codigo=0, cliente: Cliente = None, carro: Carro = None,
+                 filial: Filial = None,
                  diaria=0,
                  data_aluguel=None, tempo=0, valor_total=0, ):
         super().__init__()
@@ -37,18 +38,8 @@ class Aluguel(EntidadeBase):
     def escrever_topo_pilha(self, arquivo, rrn):
         arquivo.seek(0)
         arquivo.write(struct.pack('i', rrn))
-        print(f"Topo da pilha atualizado para {rrn}")
-
-
-
 
     def salvar_registro(self, arquivo, registro):
-        rrn_disponivel = self.remover_da_pilha(arquivo)
-        if rrn_disponivel is not None:
-            arquivo.seek(rrn_disponivel )  # Posiciona no espaço disponível
-        else:
-            arquivo.seek(0, 2)  # Adiciona no final caso não haja espaço disponível
-
         arquivo.write(struct.pack('2s', registro.marcador.encode('utf-8')))
         arquivo.write(struct.pack('i', registro.rnn_proximo))
         arquivo.write(struct.pack('i', registro.codigo))
@@ -61,8 +52,8 @@ class Aluguel(EntidadeBase):
         arquivo.write(struct.pack('i', registro.diaria))
         arquivo.write(struct.pack('i', registro.valor_total))
 
-    def excluir_registro(self, arquivo,registro):
-        rrn = arquivo.tell()-self.tamanho_registro()
+    def excluir_registro(self, arquivo, registro):
+        rrn = arquivo.tell() - self.tamanho_registro()
         topo_pilha = self.ler_topo_pilha(arquivo)
         arquivo.seek(rrn)
         registro.marcador = '*|'
@@ -80,7 +71,14 @@ class Aluguel(EntidadeBase):
         arquivo.write(struct.pack('i', registro.valor_total))
         #  Atualiza o topo da pilha
         self.escrever_topo_pilha(arquivo, rrn)
-        print(f"Registro {registro.codigo} excluído com sucesso")
+
+    def adicionar_registro(self, arquivo, registro):
+        rrn_disponivel = self.remover_da_pilha(arquivo)
+        if rrn_disponivel is not None:
+            arquivo.seek(rrn_disponivel)  # Posiciona no espaço disponível
+        else:
+            arquivo.seek(0, 2)  # Adiciona no final caso não haja espaço disponível
+        self.salvar_registro(arquivo, registro)
 
     def remover_da_pilha(self, arquivo):
         #  Lê o topo da pilha
@@ -94,8 +92,6 @@ class Aluguel(EntidadeBase):
         proximo_topo = registro.rnn_proximo
         self.escrever_topo_pilha(arquivo, proximo_topo)
         return topo_pilha
-
-
 
     def criar_registro(self, codigo, **kwargs):
         arquivo_cliente = kwargs.get('arquivo_cliente')
@@ -170,7 +166,7 @@ class Aluguel(EntidadeBase):
                 return None  # Evita leitura incompleta
 
             # Desempacota os dados
-            marcador,rnn_proximo, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
+            marcador, rnn_proximo, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
                 struct.unpack(self.get_formato(), registro_bytes)
 
             # Se for um registro excluído (*|), ignorar
@@ -230,3 +226,8 @@ class Aluguel(EntidadeBase):
         arquivo.seek(posicao * entidade.tamanho_registro() + 4)
         registro_lido = entidade.ler_registro(arquivo)
         return registro_lido
+
+    def ordenar_base(self, arquivo):
+        arquivo.seek(0)
+        arquivo.write(struct.pack('i', -1))
+        super().ordenar_base(arquivo)
