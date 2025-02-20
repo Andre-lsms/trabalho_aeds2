@@ -179,3 +179,4 @@ cython_debug/
 /telas/assets/img/cars
 *.png
 *.png
+*.txt

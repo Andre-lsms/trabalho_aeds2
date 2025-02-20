@@ -38,8 +38,9 @@ class Filial(EntidadeBase):
         except struct.error as e:
             print(f"Erro ao empacotar registro: {e}")
 
-    def imprimir(self, registro, log):
-        log.write(f"Código: {registro.codigo}\n"
+    def imprimir(self, registro):
+
+        return (f"Código: {registro.codigo}\n"
                   f"Nome: {registro.nome.upper().strip()}\n"
                   f"Email: {registro.email.strip()}\n"
                   f"Telefone: {registro.telefone.strip()}\n"

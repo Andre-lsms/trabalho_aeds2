@@ -2,6 +2,7 @@ import datetime
 import random
 import struct
 
+
 from Entidades.carro import Carro
 from Entidades.clientes import Cliente
 from Entidades.entidade_base import EntidadeBase
@@ -93,11 +94,8 @@ class Aluguel(EntidadeBase):
     # except struct.error as e:
     #     print(f"Erro ao empacotar registro: {e}")
 
-    def imprimir(self, registro, log):
-        if registro.devolvido:
-            return
-
-        log.write(f"Código: {registro.codigo}\n"
+    def imprimir(self, registro):
+       return (f"Código: {registro.codigo}\n"
                   f"ID Cliente: {registro.cliente.codigo}\n"
                   f"Nome Cliente: {registro.cliente.nome.strip()}\n"
                   f"ID Carro: {registro.carro.codigo}\n"
@@ -107,7 +105,7 @@ class Aluguel(EntidadeBase):
                   f"Diária: R${registro.diaria}\n"
                   f"Valor Total: R${registro.valor_total}\n")
 
-        return
+
 
     def ler_registro(self, arquivo):
         try:
@@ -132,6 +130,8 @@ class Aluguel(EntidadeBase):
             print(f"Erro ao desempacotar registro: {e}")
 
     def criar_base(self, tamanho, desordenada=True, **kwargs):
+        from colorama import Style, Fore
+
         arquivo = kwargs.get('arquivo')
         arquivo_cliente = kwargs.get('arquivo_cliente')
         arquivo_carro = kwargs.get('arquivo_carro')
@@ -141,7 +141,7 @@ class Aluguel(EntidadeBase):
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
 
-        print(f'Gerando a base de daso tamanho {tamanho}...')
+        print(f'{Fore.GREEN}Gerando a base de dados tamanho {tamanho}...{Style.RESET_ALL}')
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)

@@ -1,6 +1,5 @@
 import time
 from random import shuffle
-
 from faker import Faker
 
 fake = Faker('pt_BR')
@@ -22,19 +21,21 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método ler_registro")
 
-    def imprimir(self, registro, cx_log):
+    def imprimir(self, registro):
         """
         Subclasses devem implementar este método para imprimir o registro.
         """
         raise NotImplementedError("Subclasses devem implementar o método imprimir_registro")
 
     def criar_base(self, tamanho, desordenada=True, **kwargs):
+        from colorama import Style, Fore
+
         arquivo = kwargs.get('arquivo')
 
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
 
-        print(f'Gerando a base de daso tamanho {tamanho}...')
+        print(f'{Fore.GREEN}Gerando a base de dados tamanho {tamanho}...{Style.RESET_ALL}')
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
@@ -45,10 +46,15 @@ class EntidadeBase:
             self.salvar_registro(arquivo, registro)
 
     def imprimir_base(self, arquivo, log):
+        buffer = 1
+        if self.quantidade_registros(arquivo) > 500:
+            buffer = 500
+        elif self.quantidade_registros(arquivo) > 5000:
+            buffer = 5000
         arquivo.seek(0)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
-                self.imprimir(registro_lido, log)
+                log.write(self.imprimir(registro_lido),buffer=buffer)
 
     def tamanho_registro(self):
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
@@ -68,13 +74,12 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método get_formato")
 
-    def sobrescrever(self, arquivo, registro):
+    @staticmethod
+    def sobrescrever(arquivo, registro):
         posicao = arquivo.tell()
         tamanho_registro = registro.tamanho_registro()
         arquivo.seek(posicao - tamanho_registro)
         registro.salvar_registro(arquivo, registro)
-
-    from random import shuffle
 
     def desordenar_base(self, arquivo):
         # Lê todos os registros do arquivo e armazena em uma lista

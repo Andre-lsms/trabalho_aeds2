@@ -4,7 +4,7 @@ import telas.colors
 
 
 class InterfaceLogger:
-    def __init__(self, text_widget, max_linhas=5000, buffer_size=500):
+    def __init__(self, text_widget, max_linhas=5000, buffer_size=1):
         self.text_widget = text_widget  # ListView ou similar
         self.historico = []  # Armazena todas as mensagens
         self.buffer = []  # Buffer para atualizações em lote
@@ -12,7 +12,8 @@ class InterfaceLogger:
         self.max_linhas = max_linhas  # Limite de exibição (sem apagar do histórico)
         self.buffer_size = buffer_size  # Número de mensagens antes de atualizar
 
-    def write(self, message, color=telas.colors.texto_padrao()):
+    def write(self, message, color=telas.colors.texto_padrao(), buffer=1):
+        self.buffer_size = buffer
         if message.strip():
             # Armazena no histórico completo
             self.historico.append(

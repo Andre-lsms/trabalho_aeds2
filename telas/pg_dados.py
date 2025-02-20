@@ -260,7 +260,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         nome_log.update()
         try:
             button_imprimir.disabled = True
-            entidade.imprimir_base(arquivo, interface_logger, )
+            entidade.imprimir_base(arquivo, interface_logger,)
         except Exception:
             page.add(alert(mensagem=f"Escolha uma opção", icone="error", cor=laranja_aviso()))
 

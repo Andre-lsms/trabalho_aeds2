@@ -1,7 +1,7 @@
 import time
 
 import flet as ft
-
+from colorama import Style, Fore
 from Entidades.aluguel import Aluguel
 from Entidades.carro import Carro
 from Entidades.clientes import Cliente
@@ -18,30 +18,27 @@ cliente = Cliente()
 carro = Carro()
 filial = Filial()
 aluguel = Aluguel()
-arquivo_cliente = open('Bases/cliente.dat', "r+b")
-arquivo_carro = open('Bases/carro.dat', "r+b")
-arquivo_filial = open('Bases/filial.dat', "r+b")
-arquivo_aluguel = open('Bases/aluguei.dat', "r+b")
-arquivo_log = open('Bases/log.txt', "a+")
-# arquivo_cliente = open('Bases/cliente.dat', "w+b")
-# arquivo_carro = open('Bases/carro.dat', "w+b")
-# arquivo_filial = open('Bases/filial.dat', "w+b")
-# arquivo_aluguel = open('Bases/aluguei.dat', "w+b")
-# arquivo_log = open('Bases/log.txt', "w+")
+
+arquivo_cliente = open('Bases/cliente.dat', "w+b")
+arquivo_carro = open('Bases/carro.dat', "w+b")
+arquivo_filial = open('Bases/filial.dat', "w+b")
+arquivo_aluguel = open('Bases/aluguei.dat', "w+b")
+arquivo_log = open('Bases/log.txt', "w+")
 
 registro_cliente = []
 registro_carro = []
 registro_filial = []
 registro_aluguel = []
-# t_inicio = time.time()
-# tam = 100000
-# cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
-# carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
-# filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
-# aluguel.criar_base(90000, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
-#                    arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
-#                    arquivo_log=arquivo_log)
-# print("Tempo de criação dos arquivos: ", time.time() - t_inicio)
+t_inicio = time.time()
+tam = 10
+cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
+carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
+filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
+aluguel.criar_base(9, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
+                   arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
+                   arquivo_log=arquivo_log)
+
+print(f'{Fore.YELLOW}Tempo de criação dos arquivos:{time.time()-t_inicio} ...{Style.RESET_ALL}')
 
 
 def main(page: ft.Page):
@@ -125,7 +122,6 @@ def main(page: ft.Page):
             e.control.update()
 
     def get_pesquisa():
-        print(config.dados_ordenados)
 
         if not config.dados_ordenados:
             return "Sequencial"

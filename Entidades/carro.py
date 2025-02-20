@@ -48,9 +48,9 @@ class Carro(EntidadeBase):
         except struct.error as e:
             print(f"Erro ao empacotar registro: {e}")
 
-    def imprimir(self, registro, log):
+    def imprimir(self, registro):
 
-        log.write(f"Código: {registro.codigo}\n"
+        return (f"Código: {registro.codigo}\n"
                   f"Placa: {registro.placa.strip()}\n"
                   f"Marca: {registro.marca.strip()}\n"
                   f"Modelo: {registro.modelo.strip()}\n"
