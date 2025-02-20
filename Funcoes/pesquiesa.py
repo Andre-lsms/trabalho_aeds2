@@ -2,10 +2,10 @@ import math
 from time import time
 
 
-def pesquisa_sequencial(id, arquivo, entidade, log):
-    tamanho = entidade.tamanho_arquivo(arquivo)
-    quant_arquivos = tamanho // entidade.tamanho_registro()
-    arquivo.seek(0)
+
+def pesquisa_sequencial(id,arquivo,entidade,log):
+    quant_arquivos = entidade.quantidade_registros(arquivo)
+    arquivo.seek(4)
     t_inicio = time()
     comparacoes = 0
     for i in range(quant_arquivos):
@@ -26,7 +26,7 @@ def pesquisa_binaria(id, arquivo, entidade, log):
     quant_arquivos = tamanho // entidade.tamanho_registro()
     t_inicio = time()
     comparacoes = 0
-    arquivo.seek(0)
+    arquivo.seek(4)
     inicio = 0
     fim = quant_arquivos - 1
     while inicio <= fim:

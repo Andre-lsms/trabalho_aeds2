@@ -258,11 +258,12 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         log_box.controls.clear()
         log_box.update()
         nome_log.update()
-        try:
-            button_imprimir.disabled = True
-            entidade.imprimir_base(arquivo, interface_logger,)
-        except Exception:
-            page.add(alert(mensagem=f"Escolha uma opção", icone="error", cor=laranja_aviso()))
+        # try:
+        button_imprimir.disabled = True
+        entidade.imprimir_base(arquivo, interface_logger,)
+        # except Exception as e:
+        # page.add(alert(mensagem=f"Erro ao imprimir base: {str(e)}", icone="error", cor=laranja_aviso()))
+        # page.add(alert(mensagem=f"Escolha uma opção", icone="error", cor=laranja_aviso()))
 
         button_imprimir.disabled = False
         page.dialog.open = False

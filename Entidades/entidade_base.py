@@ -1,3 +1,4 @@
+import struct
 import time
 from random import shuffle
 from faker import Faker
@@ -51,11 +52,13 @@ class EntidadeBase:
             buffer = 500
         elif self.quantidade_registros(arquivo) > 5000:
             buffer = 5000
-        arquivo.seek(0)
+        arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None:
-                log.write(self.imprimir(registro_lido),buffer=buffer)
 
+            if registro_lido is not None and registro_lido != -1:
+                print(self.imprimir(registro_lido))
+                print(95 * "_")
+                log.write(self.imprimir(registro_lido),buffer=buffer)
     def tamanho_registro(self):
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
 
@@ -63,7 +66,7 @@ class EntidadeBase:
     def tamanho_arquivo(arquivo):
         arquivo.seek(0, 2)
         tamanho = arquivo.tell()
-        return int(tamanho)
+        return int(tamanho-4)
 
     def quantidade_registros(self, arquivo):
         return self.tamanho_arquivo(arquivo) // self.tamanho_registro()
@@ -84,9 +87,9 @@ class EntidadeBase:
     def desordenar_base(self, arquivo):
         # Lê todos os registros do arquivo e armazena em uma lista
         registros = []
-        arquivo.seek(0)  # Volta para o início do arquivo
+        arquivo.seek(4)  # Volta para o início do arquivo
         while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None:
+            if registro_lido is not None and registro_lido != -1:
                 registros.append(registro_lido)
 
         # Desordena a lista de registros
@@ -94,7 +97,8 @@ class EntidadeBase:
 
         # Reescreve os registros desordenados no arquivo
         arquivo.seek(0)  # Volta para o início do arquivo
-        arquivo.truncate()  # Limpa o conteúdo do arquivo
+        arquivo.truncate()
+        arquivo.write(struct.pack('i', -1))
         for registro in registros:
             self.salvar_registro(arquivo, registro)
 
@@ -105,16 +109,18 @@ class EntidadeBase:
         registros = []
 
         # Lê todos os registros corretamente
-        arquivo.seek(0)
+        arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None:
+            if registro_lido is not None and registro_lido != -1:
                 registros.append(registro_lido)
         # Ordena corretamente pela chave 'codigo'
         registros.sort(key=lambda x: x.codigo)
 
         # Volta ao início do arquivo e reescreve os registros ordenados
         arquivo.seek(0)
-        arquivo.truncate()  # Apaga o conteúdo antigo
+        arquivo.truncate()
+        arquivo.write(struct.pack('i', -1))
+        # Apaga o conteúdo antigo
 
         for registro in registros:
             self.salvar_registro(arquivo, registro)  # Salva corretamente cada registro
@@ -139,3 +145,4 @@ class EntidadeBase:
     #         arquivo.seek((i + 1) * self.tamanho_registro())
     #         self.salvar_registro(arquivo, registroj)
     #     print("Base ordenada com sucesso!")
+

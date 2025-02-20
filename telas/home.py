@@ -240,7 +240,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                         carro_busca = pesquisa_sequencial(registro.carro.codigo, arquivo_carro, carro, log)
                         filial_busca = pesquisa_sequencial(registro.filial.codigo, arquivo_filial, filial, log)
 
-                if registro == -1 or registro.devolvido:
+                if registro == -1 :
                     limpar_caixas(caixa_nome_cliente)
                     limpar_caixas(caixa_id_cliente)
                     limpar_caixas(caixa_cpf_cliente)
@@ -316,10 +316,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                 page.update()
 
     def devolver():
-        global registro, carro_busca
-        carro_busca.codigo = int(caixa_id_carro.value)
-        aluguel.devolver(arquivo=arquivo_aluguel, registro=registro, arquivo_carro=arquivo_carro, carro=carro_busca)
-        page.add(alert(mensagem="Devolução realizada com sucesso", icone=ft.icons.CHECK, cor=texto_padrao()))
+        aluguel.excluir_registro(arquivo_aluguel, registro)
 
     def limpar_caixas(caixa):
         caixa.value = ''

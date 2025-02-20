@@ -1,3 +1,4 @@
+import struct
 import time
 
 import flet as ft
@@ -19,10 +20,18 @@ carro = Carro()
 filial = Filial()
 aluguel = Aluguel()
 
-arquivo_cliente = open('Bases/cliente.dat', "w+b")
-arquivo_carro = open('Bases/carro.dat', "w+b")
-arquivo_filial = open('Bases/filial.dat', "w+b")
-arquivo_aluguel = open('Bases/aluguei.dat', "w+b")
+arquivo_cliente = open('Bases/cliente.dat', 'w+b')
+arquivo_carro = open('Bases/carro.dat', 'w+b')
+arquivo_filial = open('Bases/filial.dat', 'w+b')
+arquivo_aluguel = open('Bases/aluguel.dat', 'w+b')
+arquivo_cliente.seek(0)
+arquivo_carro.seek(0)
+arquivo_filial.seek(0)
+arquivo_aluguel.seek(0)
+arquivo_aluguel.write(struct.pack('i', -1))
+arquivo_cliente.write(struct.pack('i', -1))
+arquivo_carro.write(struct.pack('i', -1))
+arquivo_filial.write(struct.pack('i', -1))
 arquivo_log = open('Bases/log.txt', "w+")
 
 registro_cliente = []
