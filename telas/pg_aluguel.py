@@ -10,7 +10,8 @@ from Entidades.clientes import Cliente
 from Entidades.carro import Carro
 from Entidades.filial import Filial
 from telas.templates import criar_text_field
-from Funcoes.alert import alert,loading
+from Funcoes.alert import alert, loading
+
 registro_cliente = Cliente()
 registro_carro = Carro()
 registro_filial = Filial()
@@ -36,7 +37,6 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         )
     )
 
-
     caixa_id_cliente = ft.TextField(
         label='Código: ',
         label_style=ft.TextStyle(color=texto_padrao(), size=14, font_family='Inter', weight=ft.FontWeight.BOLD, ),
@@ -57,7 +57,9 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         color=texto_padrao(),
         bgcolor=botao_laranja(),
         width=100,
-        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter', weight=ft.FontWeight.BOLD, )),
+        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),
+                             text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
+                                                     weight=ft.FontWeight.BOLD, )),
         height=50,
         on_click=lambda e: buscar_cliente(e, tipo_pesquisa, arquivo_log)
     )
@@ -81,7 +83,9 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         color=texto_padrao(),
         bgcolor=botao_laranja(),
         width=100,
-        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter', weight=ft.FontWeight.BOLD, )),
+        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),
+                             text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
+                                                     weight=ft.FontWeight.BOLD, )),
         height=50,
         on_click=lambda e: buscar_carro(e, tipo_pesquisa, arquivo_log)
     )
@@ -105,11 +109,13 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         color=texto_padrao(),
         bgcolor=botao_laranja(),
         width=100,
-        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter', weight=ft.FontWeight.BOLD, )),
+        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10),
+                             text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
+                                                     weight=ft.FontWeight.BOLD, )),
         height=50,
         on_click=lambda e: buscar_filial(e, tipo_pesquisa, arquivo_log)
     )
-    caixa_id_aluguel  = ft.TextField(
+    caixa_id_aluguel = ft.TextField(
         label='Código',
         label_style=ft.TextStyle(color=texto_padrao(), size=12, font_family='Inter', weight=ft.FontWeight.BOLD, ),
         text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter', weight=ft.FontWeight.BOLD, ),
@@ -125,19 +131,18 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         on_submit=lambda e: buscar_filial(e, tipo_pesquisa, arquivo_log)
     )
 
-
     caixa_nome_cliente = criar_text_field('Nome', 410, 50)
     caixa_cpf_cliente = criar_text_field('CPF', 200, 50)
     caixa_marca_carro = criar_text_field('Marca', 200, 50)
     caixa_modelo_carro = criar_text_field('Modelo', 200, 50)
     caixa_cor_carro = criar_text_field('Cor', 200, 50)
     caixa_ano_carro = criar_text_field('Ano', 200, 50)
-    caixa_status_carro = criar_text_field('Status', 10, 50,align=ft.TextAlign.CENTER)
+    caixa_status_carro = criar_text_field('Status', 10, 50, align=ft.TextAlign.CENTER)
     caixa_nome_filial = criar_text_field('Nome', 410, 50)
     caixa_email_filial = criar_text_field('Email', 410, 50)
-    caixa_valor_diaria = criar_text_field('Valor da diária', 200, 50, prefix_text='R$',disabled=False)
+    caixa_valor_diaria = criar_text_field('Valor da diária', 200, 50, prefix_text='R$', disabled=False)
     caixa_data_aluguel = criar_text_field('Data do aluguel', 200, 50)
-    caixa_tempo = criar_text_field('Tempo', 200, 50,disabled=False)
+    caixa_tempo = criar_text_field('Tempo', 200, 50, disabled=False)
     caixa_valor_total = criar_text_field('Valor Total', 200, 50, prefix_text='R$')
     saida = ft.ListView(
         expand=True,
@@ -182,7 +187,8 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 ft.Row(
                     controls=[
                         ft.Container(
-                            content=ft.Text('DADOS DO LOCATÁRIO', size=14, weight=ft.FontWeight.BOLD, color=laranja_aviso()),
+                            content=ft.Text('DADOS DO LOCATÁRIO', size=14, weight=ft.FontWeight.BOLD,
+                                            color=laranja_aviso()),
                             bgcolor=principal(),
                             width=480,
                             height=30,
@@ -207,7 +213,8 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 ft.Row(
                     controls=[
                         ft.Container(
-                            content=ft.Text('DADOS DO CARRO', size=14, weight=ft.FontWeight.BOLD, color=laranja_aviso()),
+                            content=ft.Text('DADOS DO CARRO', size=14, weight=ft.FontWeight.BOLD,
+                                            color=laranja_aviso()),
                             bgcolor=principal(),
                             width=480,
                             height=30,
@@ -225,10 +232,10 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                                      style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), ),
                                      height=50,
                                      on_click=lambda e: exibir_carros_disponiveis(e),
-                                 ),]),
+                                 ), ]),
                 ft.Row(controls=[caixa_marca_carro, caixa_modelo_carro]),
                 ft.Row(controls=[caixa_cor_carro, caixa_ano_carro]),
-                ft.Row(controls=[caixa_status_carro,],),
+                ft.Row(controls=[caixa_status_carro, ], ),
             ],
             expand=True,
         ),
@@ -244,7 +251,8 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 ft.Row(
                     controls=[
                         ft.Container(
-                            content=ft.Text('DADOS DA FILIAL', size=14, weight=ft.FontWeight.BOLD, color=laranja_aviso()),
+                            content=ft.Text('DADOS DA FILIAL', size=14, weight=ft.FontWeight.BOLD,
+                                            color=laranja_aviso()),
                             bgcolor=principal(),
                             width=480,
                             height=30,
@@ -271,7 +279,8 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 ft.Row(
                     controls=[
                         ft.Container(
-                            content=ft.Text('DADOS DO ALUGUEL', size=14, weight=ft.FontWeight.BOLD, color=laranja_aviso()),
+                            content=ft.Text('DADOS DO ALUGUEL', size=14, weight=ft.FontWeight.BOLD,
+                                            color=laranja_aviso()),
                             bgcolor=principal(),
                             width=480,
                             height=30,
@@ -320,7 +329,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
     column_left = ft.Column(
         controls=[
             ft.Row(controls=[
-                ft.Column(controls=[column_cliente, column_carro,column_filial,]),
+                ft.Column(controls=[column_cliente, column_carro, column_filial, ]),
                 ft.Column(controls=[column_aluguel]),
                 column_carros_disponiveis,
             ],
@@ -335,12 +344,12 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         alignment=ft.MainAxisAlignment.CENTER,
     )
 
-
     def set_id():
         id = funcoes.quantidade_registros(arquivo_aluguel, aluguel)
         id += 1
         caixa_id_aluguel.value = str(id)
         caixa_data_aluguel.value = datetime.datetime.now().strftime('%d/%m/%Y')
+
     set_id()
 
     def exibir_carros_disponiveis(e):
@@ -419,7 +428,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     column_aluguel.visible = False
                     column_carro.visible = False
                     column_filial.visible = False
-                    page.add(alert(mensagem="Cliente não encontrado", icone="ERROR",cor=laranja_aviso()))
+                    page.add(alert(mensagem="Cliente não encontrado", icone="ERROR", cor=laranja_aviso()))
 
                 else:
                     caixa_id_cliente.border = 1
@@ -487,6 +496,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             finally:
                 loading_dialog.open = False
                 page.update()
+
     def buscar_filial(e, t_busca, log):
         if caixa_id_filial.value != '':
             loading_dialog.open = True
@@ -517,7 +527,6 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             finally:
                 loading_dialog.open = False
                 page.update()
-
 
     def adicionar_aluguel():
 
@@ -562,12 +571,25 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 column_carros_disponiveis.visible = False
                 button_close.visible = False
                 botao_criar_aluguel.visible = False
+                data_formatada = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+                page.open(ft.SnackBar(
+                    ft.Row(controls=[
+                        ft.Text(f'Aluguel criado com sucesso Codigo: {id}',size=14, weight=ft.FontWeight.BOLD, color=texto_padrao()),
+                        ft.Text(f'Data{data_formatada}',size=14, weight=ft.FontWeight.BOLD, color=texto_padrao()),
+                    ],
+                        spacing=30,
+                    ),
+                        duration=10000,
+                        bgcolor=laranja_aviso()
+                    )
+                )
 
             except ValueError:
                 page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
-        except Exception:
+        except Exception as e:
             page.add(alert(mensagem="Preencha todos os campos", icone="ERROR"))
+            print(e)
         carro.status = False
         set_id()
         page.update()
