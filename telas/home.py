@@ -13,7 +13,8 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
          arquivo_filial, filial, arquivo_log, tipo_pesquisa=''):
     page.padding = 0
     loading_dialog = loading()
-
+    page.dialog = loading_dialog
+    loading_dialog.open = False
 
 
 
@@ -221,11 +222,9 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
 
     def busca(e, t_busca, log):
         global cliente_busca, carro_busca, filial_busca, registro
-        page.dialog = loading_dialog
-        loading_dialog.open = True
-        page.update()
         if caixa_pesquisa.value != '':
-
+            loading_dialog.open = True
+            page.update()
             try:
                 id = int(caixa_pesquisa.value)
                 if t_busca == 'Binaria':
@@ -242,8 +241,6 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                         filial_busca = pesquisa_sequencial(registro.filial.codigo, arquivo_filial, filial, log)
 
                 if registro == -1 or registro.devolvido:
-                    loading_dialog.open = False
-                    page.update()
                     limpar_caixas(caixa_nome_cliente)
                     limpar_caixas(caixa_id_cliente)
                     limpar_caixas(caixa_cpf_cliente)
@@ -272,8 +269,6 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                     caixa_pesquisa.focus()
                     update_img("default")
                 else:
-                    loading_dialog.open = False
-                    page.update()
                     caixa_pesquisa.label = 'Aluguel encontrado'
                     # Cliente
                     caixa_id_cliente.value = cliente_busca.codigo
@@ -314,11 +309,11 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                     e.page.update()
 
             except ValueError:
-                loading_dialog.open = False
-                page.update()
                 page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
-        e.page.update()
+            finally:
+                loading_dialog.open = False
+                page.update()
 
     def devolver():
         global registro, carro_busca

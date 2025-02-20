@@ -19,6 +19,8 @@ registro_filial = Filial()
 def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
                   arquivo_filial, filial, arquivo_log, tipo_pesquisa=''):
     loading_dialog = loading()
+    page.dialog = loading_dialog
+    loading_dialog.open = False
     page.padding = 0
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
@@ -342,16 +344,15 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
     set_id()
 
     def exibir_carros_disponiveis(e):
+        loading_dialog.open = True
+        page.update()
         column_carros_disponiveis.visible = True
         saida.clean()
         carro.exibir_disponiveis(arquivo_carro, interface_logger),
         caixa_id_carro.focus()
         button_close.visible = True
-        e.page.update()
-        if not carro.exibir_disponiveis(arquivo_carro, interface_logger):
-            column_carros_disponiveis.visible = False
-            button_close.visible = False
-            page.add(alert(mensagem="Nenhum carro disponível", icone="ERROR",cor=laranja_aviso()))
+        loading_dialog.open = False
+        page.update()
 
     def column_hide(e):
         column_carros_disponiveis.visible = False
@@ -402,10 +403,9 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
             page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
     def buscar_cliente(e, t_busca, log):
-        page.dialog = loading_dialog
-        loading_dialog.open = True
-        page.update()
         if caixa_id_cliente.value != '':
+            loading_dialog.open = True
+            page.update()
             id = caixa_id_cliente.value
             try:
                 id = int(id)
@@ -414,19 +414,14 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 else:
                     registro = pesquisa_sequencial(id, arquivo_cliente, cliente, log)
                 if registro == -1:
-                    loading_dialog.open = False
-                    page.update()
                     limpar_caixas(caixa_nome_cliente)
                     limpar_caixas(caixa_cpf_cliente)
-
                     column_aluguel.visible = False
                     column_carro.visible = False
                     column_filial.visible = False
                     page.add(alert(mensagem="Cliente não encontrado", icone="ERROR",cor=laranja_aviso()))
 
                 else:
-                    loading_dialog.open = False
-                    page.update()
                     caixa_id_cliente.border = 1
                     caixa_nome_cliente.value = registro.nome
                     caixa_cpf_cliente.value = registro.cpf
@@ -435,17 +430,16 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     registro_cliente = registro
                     column_carro.visible = True
             except ValueError:
-                loading_dialog.open = False
-                page.update()
                 page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
-        e.page.update()
+            finally:
+                loading_dialog.open = False
+                page.update()
 
     def buscar_carro(e, t_busca, log):
-        page.dialog = loading_dialog
-        loading_dialog.open = True
-        page.update()
         if caixa_id_carro.value != '':
+            loading_dialog.open = True
+            page.update()
             id = caixa_id_carro.value
             try:
                 id = int(id)
@@ -455,8 +449,6 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     registro = pesquisa_sequencial(id, arquivo_carro, carro, log)
 
                 if registro == -1:
-                    loading_dialog.open = False
-                    page.update()
                     limpar_caixas(caixa_marca_carro)
                     limpar_caixas(caixa_modelo_carro)
                     limpar_caixas(caixa_cor_carro)
@@ -466,8 +458,6 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     column_filial.visible = False
                     page.add(alert(mensagem="Carro não encontrado", icone="ERROR"))
                 else:
-                    loading_dialog.open = False
-                    page.update()
                     caixa_id_carro.border = 1
                     caixa_id_carro.label = 'Carro'
                     caixa_marca_carro.value = registro.marca
@@ -493,16 +483,14 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     global registro_carro
                     registro_carro = registro
             except ValueError:
+                page.add(alert(mensagem="Digite um numero", icone="ERROR"))
+            finally:
                 loading_dialog.open = False
                 page.update()
-                page.add(alert(mensagem="Digite um numero", icone="ERROR"))
-        e.page.update()
-
     def buscar_filial(e, t_busca, log):
-        page.dialog = loading_dialog
-        loading_dialog.open = True
-        page.update()
         if caixa_id_filial.value != '':
+            loading_dialog.open = True
+            page.update()
             id = caixa_id_filial.value
             try:
                 id = int(id)
@@ -512,16 +500,12 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     registro = pesquisa_sequencial(id, arquivo_filial, filial, log)
 
                 if registro == -1:
-                    loading_dialog.open = False
-                    page.update()
                     limpar_caixas(caixa_nome_filial)
                     limpar_caixas(caixa_email_filial)
                     column_aluguel.visible = False
                     page.add(alert(mensagem="Filial não encontrada", icone="ERROR"))
 
                 else:
-                    loading_dialog.open = False
-                    page.update()
                     caixa_id_filial.label = 'Filial'
                     caixa_nome_filial.value = registro.nome
                     caixa_email_filial.value = registro.email
@@ -529,11 +513,11 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                     registro_filial = registro
                     column_aluguel.visible = True
             except ValueError:
+                page.add(alert(mensagem="Digite um numero", icone="ERROR"))
+            finally:
                 loading_dialog.open = False
                 page.update()
-                page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
-        e.page.update()
 
     def adicionar_aluguel():
 
@@ -556,6 +540,29 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
 
                 aluguel.salvar_registro(arquivo=arquivo_aluguel, registro=registro)
                 page.add(alert(mensagem="Aluguel criado com sucesso", icone="done", cor=texto_padrao()))
+                limpar_caixas(caixa_id_cliente)
+                limpar_caixas(caixa_nome_cliente)
+                limpar_caixas(caixa_cpf_cliente)
+                limpar_caixas(caixa_id_carro)
+                limpar_caixas(caixa_marca_carro)
+                limpar_caixas(caixa_modelo_carro)
+                limpar_caixas(caixa_cor_carro)
+                limpar_caixas(caixa_ano_carro)
+                limpar_caixas(caixa_status_carro)
+                limpar_caixas(caixa_id_filial)
+                limpar_caixas(caixa_nome_filial)
+                limpar_caixas(caixa_email_filial)
+                limpar_caixas(caixa_valor_diaria)
+                limpar_caixas(caixa_data_aluguel)
+                limpar_caixas(caixa_tempo)
+                limpar_caixas(caixa_valor_total)
+                column_aluguel.visible = False
+                column_carro.visible = False
+                column_filial.visible = False
+                column_carros_disponiveis.visible = False
+                button_close.visible = False
+                botao_criar_aluguel.visible = False
+
             except ValueError:
                 page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 

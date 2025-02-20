@@ -6,8 +6,10 @@ from Funcoes.config import config
 from Funcoes.alert import alert,loading
 
 def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
-              arquivo_filial, filial, arquivo_log, dados_ordenados=None):
+              arquivo_filial, filial, arquivo_log,):
     loading_dialog = loading()
+    page.dialog = loading_dialog
+    loading_dialog.open = False
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
             track_color=ft.colors.TRANSPARENT,  # Apenas a cor direta, sem chaves
@@ -50,7 +52,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
             shape=ft.RoundedRectangleBorder(radius=10),
         ),
         height=60,
-        on_click=lambda e: open_log(arquivo_log),
+        on_click=lambda e: open_log(),
     )
     button_ordenar = ft.ElevatedButton(
         text="Ordenar arquivos",
@@ -177,20 +179,31 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         page.update()
     update_data()
 
-    def open_log(a_log):
-        log_box.clean()
-        log_box.update()
+    def open_log():
+        page.update()
         nome_log.value = "LOG"
+
+        log_box.controls.clear()
+        nome_log.update()  # Atualiza o nome imediatamente
+        log_box.update()  # Atualiza a interface do log_box
+
+        try:
+            button_log.disabled = True  # Evita cliques múltiplos
+            arquivo_log.seek(0)
+            log = arquivo_log.read()
+
+            if not log.strip():
+                page.add(alert(mensagem="O arquivo de log está vazio!", icone="error", cor=laranja_aviso()))
+            else:
+                log_box.controls.append(ft.Text(log))  # Exibe os logs
+        except Exception as e:
+            page.add(alert(mensagem=f"Erro ao abrir log: {str(e)}", icone="error", cor=laranja_aviso()))
+
+        button_log.disabled = False
         log_box.update()
-        arquivo_log.seek(0)
-        log = arquivo_log.read()
-        interface_logger.write(log)
         page.update()
 
-
-
     def desordenar_bases():
-        page.dialog = loading_dialog
         loading_dialog.open = True
         page.update()
         button_desordenar.disabled = True
@@ -207,7 +220,6 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         button_ordenar.disabled = False
 
     def ordenar_bases():
-        page.dialog = loading_dialog
         loading_dialog.open = True
         page.update()
         button_ordenar.disabled = True
@@ -224,7 +236,6 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         button_desordenar.disabled = False
 
     def imprimir_base():
-        page.dialog = loading("Imprimindo...")
         page.dialog.open = True
         page.update()
         global entidade, arquivo
