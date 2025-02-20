@@ -9,6 +9,7 @@ fake = Faker('pt_BR')
 class EntidadeBase:
     def __init__(self, ):
         self.fake = fake
+        self.topo = -1
 
     def criar_registro(self, codigo, **kwargs):
         raise NotImplementedError("Subclasses devem implementar o método criar_registro")
@@ -45,7 +46,7 @@ class EntidadeBase:
             self.salvar_registro(arquivo, registro)
 
     def imprimir_base(self, arquivo):
-        arquivo.seek(0)
+        arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
                 self.imprimir(registro_lido)
@@ -57,7 +58,7 @@ class EntidadeBase:
     def tamanho_arquivo(arquivo):
         arquivo.seek(0, 2)
         tamanho = arquivo.tell()
-        return int(tamanho)
+        return int(tamanho-4)
 
     def quantidade_registros(self, arquivo):
         return self.tamanho_arquivo(arquivo) // self.tamanho_registro()
@@ -132,3 +133,4 @@ class EntidadeBase:
     #         arquivo.seek((i + 1) * self.tamanho_registro())
     #         self.salvar_registro(arquivo, registroj)
     #     print("Base ordenada com sucesso!")
+

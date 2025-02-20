@@ -14,11 +14,13 @@ c_carros = Carro()
 
 class Aluguel(EntidadeBase):
 
-
-    def __init__(self, codigo=0, cliente: Cliente = None, carro: Carro = None, filial: Filial = None, diaria = 0,
-                 data_aluguel=None, tempo=0, valor_total=0, devolvido=False):
+    def __init__(self, marcador=None,rnn_proximo = 0, codigo=0, cliente: Cliente = None, carro: Carro = None, filial: Filial = None,
+                 diaria=0,
+                 data_aluguel=None, tempo=0, valor_total=0, ):
         super().__init__()
         self.nome_classe = 'Aluguel'
+        self.marcador = marcador
+        self.rnn_proximo = rnn_proximo
         self.codigo = codigo
         self.cliente = cliente
         self.carro = carro
@@ -27,7 +29,68 @@ class Aluguel(EntidadeBase):
         self.data_aluguel = data_aluguel
         self.tempo = tempo
         self.valor_total = valor_total
-        self.devolvido = devolvido
+
+    def ler_topo_pilha(self, arquivo):
+        arquivo.seek(0)
+        return struct.unpack('i', arquivo.read(4))[0]
+
+    def escrever_topo_pilha(self, arquivo, rrn):
+        arquivo.seek(0)
+        arquivo.write(struct.pack('i', rrn))
+
+
+
+    def remover_da_pilha(self, arquivo):
+        topo_pilha = self.ler_topo_pilha(arquivo)
+        if topo_pilha == -1:
+            return None
+
+        arquivo.seek(topo_pilha * self.tamanho_registro() + 4)
+        proximo_topo = struct.unpack('i', arquivo.read(4))[0]
+        self.escrever_topo_pilha(arquivo, proximo_topo)
+        return topo_pilha
+
+    def salvar_registro(self, arquivo, registro):
+        rrn_disponivel = self.remover_da_pilha(arquivo)
+        if rrn_disponivel is not None:
+            arquivo.seek(rrn_disponivel * self.tamanho_registro() + 4)  # Posiciona no espaço disponível
+        else:
+            arquivo.seek(0, 2)  # Adiciona no final caso não haja espaço disponível
+
+        arquivo.write(struct.pack('2s', registro.marcador.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.rnn_proximo))
+        arquivo.write(struct.pack('i', registro.codigo))
+        arquivo.write(struct.pack('i', registro.cliente.codigo))
+        arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.carro.codigo))
+        arquivo.write(struct.pack('i', registro.filial.codigo))
+        arquivo.write(struct.pack('10s', registro.data_aluguel.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.tempo))
+        arquivo.write(struct.pack('i', registro.diaria))
+        arquivo.write(struct.pack('i', registro.valor_total))
+
+    def excluir_registro(self, arquivo,registro):
+        rrn = arquivo.tell()-self.tamanho_registro()
+        topo_pilha = self.ler_topo_pilha(arquivo)
+        arquivo.seek(rrn)
+        registro.marcador = '*|'
+        registro.rnn_proximo = topo_pilha
+        arquivo.write(struct.pack('2s', registro.marcador.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.rnn_proximo))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('10s', registro.data_aluguel.encode('utf-8')))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('i', 0))
+        arquivo.write(struct.pack('i', registro.valor_total))
+
+        self.escrever_topo_pilha(arquivo, rrn)
+
+
+
 
     def criar_registro(self, codigo, **kwargs):
         arquivo_cliente = kwargs.get('arquivo_cliente')
@@ -62,10 +125,11 @@ class Aluguel(EntidadeBase):
             self.data_aluguel = data.strftime('%d/%m/%Y')
         if self.tempo is None:
             self.tempo = (datetime.date.today() - datetime.datetime.strptime(self.data_aluguel, "%d/%m/%Y").date()).days
-        # datetime.datetime.now().strftime('%d/%m/%Y')  datetime.strptime(data_string, "%d/%m/%Y").date()
         self.valor_total = self.diaria * self.tempo
 
         return Aluguel(
+            marcador='|',
+            rnn_proximo=-1,
             codigo=self.codigo,
             cliente=self.cliente,
             carro=self.carro,
@@ -76,61 +140,54 @@ class Aluguel(EntidadeBase):
             valor_total=self.valor_total
         )
 
-    def salvar_registro(self, arquivo, registro):
-
-        # try:
-        arquivo.write(struct.pack('i', registro.codigo))
-        arquivo.write(struct.pack('i', registro.cliente.codigo))
-        arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.carro.codigo))
-        arquivo.write(struct.pack('i', registro.filial.codigo))
-        arquivo.write(struct.pack('10s', registro.data_aluguel.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.tempo))
-        arquivo.write(struct.pack('i', registro.diaria))
-        arquivo.write(struct.pack('i', registro.valor_total))
-        arquivo.write(struct.pack('?', registro.devolvido))
-
-    # except struct.error as e:
-    #
     def imprimir(self, registro):
-        if registro.devolvido:
+        if registro.marcador == '*|':
             return
-        print(f'{95 * "_"}')
-        print(f"Código: {registro.codigo}")
-        print(f"ID Cliente: {registro.cliente.codigo}")
-        print(f"Nome Cliente: {registro.cliente.nome.strip()}")
-        print(f"ID Carro: {registro.carro.codigo}")
-        print(f"ID Filial: {registro.filial.codigo}")
-        print(f"Data do Aluguel: {registro.data_aluguel}")
-        print(f"Tempo: {registro.tempo} Dias")
-        print(f"Diária: R${registro.diaria}")
-        print(f"Valor Total: R${registro.valor_total}")
-        print(f'{96 * "_"}')
-# except struct.error as e:
-    #     print(f"Erro ao empacotar registro: {e}")
-
+        else:
+            print(f'{95 * "_"}')
+            print(f"Código: {registro.codigo}")
+            print(f"ID Cliente: {registro.cliente.codigo}")
+            print(f"Nome Cliente: {registro.cliente.nome.strip()}")
+            print(f"ID Carro: {registro.carro.codigo}")
+            print(f"ID Filial: {registro.filial.codigo}")
+            print(f"Data do Aluguel: {registro.data_aluguel}")
+            print(f"Tempo: {registro.tempo} Dias")
+            print(f"Diária: R${registro.diaria}")
+            print(f"Valor Total: R${registro.valor_total}")
+            print(f'{96 * "_"}')
 
     def ler_registro(self, arquivo):
         try:
+            posicao_atual = arquivo.tell()  # Salva posição inicial
             registro_bytes = arquivo.read(self.tamanho_registro())
-            if len(registro_bytes) < self.tamanho_registro():
-                return None
 
-            registro = struct.unpack(self.get_formato(), registro_bytes)
-            codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total, devolvido = registro
+            if len(registro_bytes) < self.tamanho_registro():
+                return None  # Evita leitura incompleta
+
+            # Desempacota os dados
+            marcador,rnn_proximo, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
+                struct.unpack(self.get_formato(), registro_bytes)
+
+            # Se for um registro excluído (*|), ignorar
+            if marcador == '*|':
+                return -1
             return Aluguel(
+                marcador=marcador.decode('utf-8').rstrip(chr(0)),
+                rnn_proximo=rnn_proximo,
                 codigo=codigo,
-                cliente=Cliente(codigo=id_cliente, nome=nome_cliente.decode('utf-8').rstrip(chr(0)),),
-                carro= Carro(codigo=id_carro),
+                cliente=Cliente(codigo=id_cliente, nome=nome_cliente.decode('utf-8').rstrip(chr(0))),
+                carro=Carro(codigo=id_carro),
                 filial=Filial(codigo=id_filial),
                 data_aluguel=data_aluguel.decode('utf-8').rstrip(chr(0)),
                 diaria=diaria,
                 tempo=tempo,
                 valor_total=valor_total,
-                devolvido=devolvido
             )
+
         except struct.error as e:
-            print(f"Erro ao desempacotar registro: {e}")
+            print(f"Erro ao desempacotar registro na posição {posicao_atual}: {e}")
+        except UnicodeDecodeError as e:
+            print(f"Erro ao decodificar marcador na posição {posicao_atual}: {e}")
 
     def criar_base(self, tamanho, desordenada=True, **kwargs):
         arquivo = kwargs.get('arquivo')
@@ -155,23 +212,16 @@ class Aluguel(EntidadeBase):
             self.salvar_registro(arquivo, registro)
 
     def get_formato(self):
-        return '=ii30sii10siii?'
+        return '=2siii30sii10siii'
 
     def tamanho_registro(self):
         return int(struct.calcsize(self.get_formato()))
-
-    @staticmethod
-    def devolver(arquivo, registro, arquivo_carro, carro):
-        registro.devolvido = True
-        carro.disponivel = True
-        carro.sobrescrever(arquivo_carro, carro)
-        registro.sobrescrever(arquivo, registro)
 
     @staticmethod
     def escolher_registro_aleatorio(arquivo, entidade):
         tamanho = entidade.tamanho_arquivo(arquivo)
         quant_arquivos = tamanho // entidade.tamanho_registro()
         posicao = random.randint(0, quant_arquivos - 1)
-        arquivo.seek(posicao * entidade.tamanho_registro())
+        arquivo.seek(posicao * entidade.tamanho_registro() + 4)
         registro_lido = entidade.ler_registro(arquivo)
         return registro_lido
