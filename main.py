@@ -34,15 +34,16 @@ alugueis.criar_base(tam, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arqui
 #
 reg1 = Funcoes.pesquiesa.pesquisa_sequencial(1, arquivo, alugueis)
 alugueis.excluir_registro(arquivo,reg1)
-
-reg2 = Funcoes.pesquiesa.pesquisa_sequencial(2, arquivo, alugueis)
+reg2 = Funcoes.pesquiesa.pesquisa_sequencial(3, arquivo, alugueis)
 alugueis.excluir_registro(arquivo,reg2)
 
-reg3 = Funcoes.pesquiesa.pesquisa_sequencial(3, arquivo, alugueis)
-alugueis.excluir_registro(arquivo,reg3)
+
+#
+#
+#
+alugu = alugueis.criar_registro(123, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
+alugueis.salvar_registro(arquivo, alugu)
+alugu2 = alugueis.criar_registro(124, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
+alugueis.salvar_registro(arquivo, alugu2)
 alugueis.imprimir_base(arquivo)
-#
-#
-#
-# alugu = alugueis.criar_registro(123, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
 

@@ -37,23 +37,15 @@ class Aluguel(EntidadeBase):
     def escrever_topo_pilha(self, arquivo, rrn):
         arquivo.seek(0)
         arquivo.write(struct.pack('i', rrn))
+        print(f"Topo da pilha atualizado para {rrn}")
 
 
 
-    def remover_da_pilha(self, arquivo):
-        topo_pilha = self.ler_topo_pilha(arquivo)
-        if topo_pilha == -1:
-            return None
-
-        arquivo.seek(topo_pilha * self.tamanho_registro() + 4)
-        proximo_topo = struct.unpack('i', arquivo.read(4))[0]
-        self.escrever_topo_pilha(arquivo, proximo_topo)
-        return topo_pilha
 
     def salvar_registro(self, arquivo, registro):
         rrn_disponivel = self.remover_da_pilha(arquivo)
         if rrn_disponivel is not None:
-            arquivo.seek(rrn_disponivel * self.tamanho_registro() + 4)  # Posiciona no espaço disponível
+            arquivo.seek(rrn_disponivel )  # Posiciona no espaço disponível
         else:
             arquivo.seek(0, 2)  # Adiciona no final caso não haja espaço disponível
 
@@ -86,9 +78,22 @@ class Aluguel(EntidadeBase):
         arquivo.write(struct.pack('i', 0))
         arquivo.write(struct.pack('i', 0))
         arquivo.write(struct.pack('i', registro.valor_total))
-
+        #  Atualiza o topo da pilha
         self.escrever_topo_pilha(arquivo, rrn)
+        print(f"Registro {registro.codigo} excluído com sucesso")
 
+    def remover_da_pilha(self, arquivo):
+        #  Lê o topo da pilha
+        topo_pilha = self.ler_topo_pilha(arquivo)
+
+        if topo_pilha == -1:
+            return None
+
+        arquivo.seek(topo_pilha)
+        registro = self.ler_registro(arquivo)
+        proximo_topo = registro.rnn_proximo
+        self.escrever_topo_pilha(arquivo, proximo_topo)
+        return topo_pilha
 
 
 
