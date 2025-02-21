@@ -59,7 +59,7 @@ def main(page: ft.Page):
     page.window.max_height = 860
     page.window.width = 1600
     page.window.height = 860
-    page.window.maximizable = False
+    page.window.maximizable = True
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.START
     page.padding = 0

@@ -3,7 +3,7 @@ import flet as ft
 
 
 def criar_text_field(label, width, height, prefix_text='', disabled=True,align=ft.TextAlign.CENTER,
-                     bgcolor=ft.colors.TRANSPARENT):
+                     bgcolor=ft.Colors.TRANSPARENT):
     return ft.TextField(
         label=f'{label}: ' if not prefix_text else label,
         label_style=ft.TextStyle(

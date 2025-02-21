@@ -16,7 +16,7 @@ filial = Filial()
 def home(page: ft.Page,arquivo_aluguel,arquivo_cliente,arquivo_carro,arquivo_filial,arquivo_log):
     page.padding = 0
     loading_dialog = loading()
-    page.dialog = loading_dialog
+    page.overlay.append(loading_dialog)
     loading_dialog.open = False
 
 

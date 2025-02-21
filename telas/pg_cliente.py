@@ -12,7 +12,7 @@ registro = None
 
 def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log):
     loading_dialog = loading()
-    page.dialog = loading_dialog
+    page.overlay.append(loading_dialog)
     loading_dialog.open = False
 
     caixa_pesquisa = ft.TextField(

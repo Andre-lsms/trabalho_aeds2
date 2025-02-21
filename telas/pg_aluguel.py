@@ -21,12 +21,12 @@ filial = Filial()
 def criar_aluguel(page: ft.Page, arquivo_aluguel, arquivo_cliente, arquivo_carro,
                   arquivo_filial, arquivo_log):
     loading_dialog = loading()
-    page.dialog = loading_dialog
+    page.overlay.append(loading_dialog)
     loading_dialog.open = False
     page.padding = 0
     page.theme = ft.Theme(
         scrollbar_theme=ft.ScrollbarTheme(
-            track_color=ft.colors.TRANSPARENT,  # Apenas a cor direta, sem chaves
+            track_color=ft.Colors.TRANSPARENT,  # Apenas a cor direta, sem chaves
 
             track_visibility=True,
             thumb_visibility=True,
