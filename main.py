@@ -12,7 +12,6 @@ from telas.pg_aluguel import criar_aluguel
 from telas.pg_dados import data_page
 from telas.home import home
 from telas.pg_cliente import pg_clientes
-from Funcoes.config import config
 import time
 
 cliente = Cliente()
@@ -24,6 +23,7 @@ arquivo_cliente = open('Bases/cliente.dat', 'w+b')
 arquivo_carro = open('Bases/carro.dat', 'w+b')
 arquivo_filial = open('Bases/filial.dat', 'w+b')
 arquivo_aluguel = open('Bases/aluguel.dat', 'w+b')
+arquivo_log = open('Bases/log.txt', "w+")
 arquivo_cliente.seek(0)
 arquivo_carro.seek(0)
 arquivo_filial.seek(0)
@@ -32,25 +32,24 @@ arquivo_aluguel.write(struct.pack('i', -1))
 arquivo_cliente.write(struct.pack('i', -1))
 arquivo_carro.write(struct.pack('i', -1))
 arquivo_filial.write(struct.pack('i', -1))
-arquivo_log = open('Bases/log.txt', "w+")
 
-registro_cliente = []
-registro_carro = []
-registro_filial = []
-registro_aluguel = []
 t_inicio = time.time()
 tam = 10
 cliente.criar_base(tam, arquivo=arquivo_cliente, desordenada=True)
 carro.criar_base(tam, arquivo=arquivo_carro, desordenada=True)
 filial.criar_base(tam, arquivo=arquivo_filial, desordenada=True)
-aluguel.criar_base(9, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
+aluguel.criar_base(10, arquivo=arquivo_aluguel, arquivo_cliente=arquivo_cliente,
                    arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial, desordenada=True,
                    arquivo_log=arquivo_log)
 
-print(f'{Fore.YELLOW}Tempo de criação dos arquivos:{time.time()-t_inicio} ...{Style.RESET_ALL}')
+print(f'{Fore.YELLOW}Tempo de criação dos arquivos:{time.time() - t_inicio} ...{Style.RESET_ALL}')
 
 
 def main(page: ft.Page):
+    page.session.set("quantidade_alugueis", aluguel.quantidade_registros(arquivo_aluguel))
+    page.session.set("quantidade_clientes", cliente.quantidade_registros(arquivo_cliente))
+    page.session.set("quantidade_carros", carro.quantidade_registros(arquivo_carro))
+    page.session.set("quantidade_filiais", filial.quantidade_registros(arquivo_filial))
     page.title = 'Locadora de Carros'
     page.header = 'Locadora de Carros'
     page.bgcolor = fundo()
@@ -65,6 +64,12 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.START
     page.padding = 0
     page.margin = 0
+
+    pag_home = home(page, arquivo_aluguel, arquivo_cliente, arquivo_carro, arquivo_filial, arquivo_log)
+    pag_aluguel = criar_aluguel(page, arquivo_aluguel, arquivo_cliente, arquivo_carro, arquivo_filial, arquivo_log)
+    pag_cliente = pg_clientes(page, arquivo_cliente, arquivo_log)
+    page.session.set("bases_ordenadas", False)
+    page.session.set("tipo_pesquisa", "Sequencial")
 
     header = ft.Row(
         controls=[
@@ -117,44 +122,33 @@ def main(page: ft.Page):
     sort_bar = ft.Row(controls=[opcoes])
 
     def validar_opcao(e):
-        if e.control.value == "Binaria" and not config.dados_ordenados:
+        if e.control.value == "Binaria" and not page.session.get('bases_ordenadas'):
             for i in range(3, 0, -1):
                 e.control.error_text = f"Base deve estar ordenada. Retornando em: {i}"
                 e.page.update()
                 time.sleep(1)
             e.page.update()
             e.control.value = "Sequencial"
+            page.session.set("tipo_pesquisa", e.control.value)
             e.control.error_text = ""
             e.page.update()
         else:
+            page.session.set("tipo_pesquisa", e.control.value)
             e.control.error_text = ""
             e.control.update()
-
-    def get_pesquisa():
-
-        if not config.dados_ordenados:
-            return "Sequencial"
-        else:
-            return opcoes.value
 
     def update_content(index):
         content_container.controls.clear()
 
         if index == 0:
-            content_container.controls.extend(home(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
-                                                   arquivo_carro, carro, arquivo_filial, filial, arquivo_log,
-                                                   tipo_pesquisa=get_pesquisa()))
-        elif index ==1:
-            content_container.controls.extend(criar_aluguel(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
-                                                            arquivo_carro, carro, arquivo_filial, filial, arquivo_log,
-                                                            tipo_pesquisa=get_pesquisa(), ))
+            content_container.controls.extend(pag_home)
+        elif index == 1:
+            content_container.controls.extend(pag_aluguel)
         elif index == 2:
-            content_container.controls.extend(pg_clientes(page, arquivo_cliente, arquivo_log, cliente,
-                                                          tipo_pesquisa=get_pesquisa(), ))
+            content_container.controls.extend(pag_cliente)
         elif index == 3:
-            content_container.controls.extend(data_page(page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
-                                                        arquivo_carro, carro, arquivo_filial, filial,
-                                                        arquivo_log,))
+            content_container.controls.extend(data_page(page,  arquivo_aluguel, arquivo_cliente, arquivo_carro,
+              arquivo_filial, arquivo_log ))
         page.update()
 
     page.add(

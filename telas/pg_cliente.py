@@ -1,6 +1,7 @@
 import flet as ft
 
 from Entidades import funcoes
+from Entidades.clientes import Cliente
 from Funcoes.alert import alert, loading
 from Funcoes.pesquiesa import *
 from telas.colors import *
@@ -9,7 +10,7 @@ from telas.templates import criar_text_field
 registro = None
 
 
-def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesquisa):
+def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log):
     loading_dialog = loading()
     page.dialog = loading_dialog
     loading_dialog.open = False
@@ -23,7 +24,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
         prefix_text='#',
         disabled=False,
         bgcolor=fundo_neutro(),
-        on_submit=lambda e: busca(e, tipo_pesquisa, arquivo_log),
+        on_submit=lambda e: busca(e, arquivo_log),
         border_radius=10,
         border_width=0,
         autofocus=True,
@@ -39,7 +40,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
                                                      weight=ft.FontWeight.BOLD, )),
 
         height=50,
-        on_click=lambda e: busca(e, tipo_pesquisa, arquivo_log),
+        on_click=lambda e: busca(e, arquivo_log),
     )
     caixa_id_cliente = criar_text_field('Código', 200, 80, prefix_text='#')
     caixa_nome_cliente = criar_text_field('Nome', 410, 80)
@@ -131,7 +132,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
     )
 
     def set_id():
-        id = funcoes.quantidade_registros(arquivo_cliente, cliente)
+        id = funcoes.quantidade_registros(arquivo_cliente,Cliente())
         id += 1
         caixa_id_cliente.value = str(id)
 
@@ -146,7 +147,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
             endereco = caixa_endereco_cliente.value
             telefone = caixa_telefone_cliente.value
             email = caixa_email_cliente.value
-            cliente.salvar_registro(arquivo_cliente, cliente.criar_registro(id, nome=nome, idade=idade, cpf=cpf,
+            Cliente().salvar_registro(arquivo_cliente, Cliente().criar_registro(id, nome=nome, idade=idade, cpf=cpf,
                                                                             endereco=endereco, telefone=telefone,
                                                                             email=email))
             set_id()
@@ -184,17 +185,17 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
         botao_cadastrar.on_click = lambda e: salvar_edicao(e)
         e.page.update()
 
-    def busca(e, t_busca, log):
+    def busca(e, log):
         if caixa_id_cliente.value != '':
             loading_dialog.open = True
             page.update()
             global registro
             try:
                 id = int(caixa_pesquisa.value)
-                if t_busca == 'Sequencial':
-                    registro = pesquisa_sequencial(id, arquivo_cliente, cliente, log)
+                if page.session.get('tipo_pesquisa') == 'Binaria':
+                    registro = pesquisa_binaria(id, arquivo_cliente, Cliente(), log)
                 else:
-                    registro = pesquisa_binaria(id, arquivo_cliente, cliente, log)
+                    registro = pesquisa_sequencial(id, arquivo_cliente, Cliente(), log)
                 if registro == -1:
                     caixa_nome_cliente.value = ''
                     caixa_idade_cliente.value = ''
@@ -202,7 +203,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
                     caixa_endereco_cliente.value = ''
                     caixa_telefone_cliente.value = ''
                     caixa_email_cliente.value = ''
-                    page.add(alert(mensagem="Aluguel Não Encontrado", icone="ERROR"))
+                    page.add(alert(mensagem="Cliente Não Encontrado", icone="ERROR"))
 
                 else:
                     caixa_id_cliente.disabled = True
@@ -232,7 +233,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
                 loading_dialog.open = False
                 page.update()
     def salvar_edicao(e):
-        posicao = arquivo_cliente.tell() - cliente.tamanho_registro()
+        posicao = arquivo_cliente.tell() - Cliente().tamanho_registro()
         arquivo_cliente.seek(posicao)
         nome = caixa_nome_cliente.value
         idade = int(caixa_idade_cliente.value)
@@ -240,21 +241,29 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log, cliente, tipo_pesqu
         endereco = caixa_endereco_cliente.value
         telefone = caixa_telefone_cliente.value
         email = caixa_email_cliente.value
-        registro = cliente.criar_registro(int(caixa_id_cliente.value), nome=nome, idade=idade, cpf=cpf,
+        if nome == '' or idade == '' or cpf == '' or endereco == '' or telefone == '' or email == '':
+            page.add(alert(mensagem="Insira todos os dados", icone="ERROR", cor=laranja_aviso()))
+            return
+        elif idade>70 and idade<18:
+            page.add(alert(mensagem="Idade inválida", icone="ERROR", cor=laranja_aviso()))
+            return
+
+        else:
+            registro = Cliente().criar_registro(int(caixa_id_cliente.value), nome=nome, idade=idade, cpf=cpf,
                                           endereco=endereco, telefone=telefone, email=email)
-        cliente.salvar_registro(registro=registro, arquivo=arquivo_cliente)
-        caixa_idade_cliente.value = ''
-        caixa_nome_cliente.value = ''
-        caixa_cpf_cliente.value = ''
-        caixa_endereco_cliente.value = ''
-        caixa_telefone_cliente.value = ''
-        caixa_email_cliente.value = ''
-        botao_cadastrar.text = 'Cadastrar'
-        botao_cadastrar.on_click = lambda e: cadastro()
-        botao_cadastrar.visible = True
-        botao_cancelar.visible = False
-        set_id()
-        page.add(alert(mensagem="Cliente editado com sucesso", icone="CHECK", cor=fundo_neutro()))
+            Cliente().salvar_registro(registro=registro, arquivo=arquivo_cliente)
+            caixa_idade_cliente.value = ''
+            caixa_nome_cliente.value = ''
+            caixa_cpf_cliente.value = ''
+            caixa_endereco_cliente.value = ''
+            caixa_telefone_cliente.value = ''
+            caixa_email_cliente.value = ''
+            botao_cadastrar.text = 'Cadastrar'
+            botao_cadastrar.on_click = lambda e: cadastro()
+            botao_cadastrar.visible = True
+            botao_cancelar.visible = False
+            set_id()
+            page.add(alert(mensagem="Cliente editado com sucesso", icone="CHECK", cor=fundo_neutro()))
 
     def cancelar_edicao(e):
 

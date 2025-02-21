@@ -1,12 +1,20 @@
 import flet as ft
 
+from Entidades.aluguel import Aluguel
+from Entidades.carro import Carro
+from Entidades.clientes import Cliente
+from Entidades.filial import Filial
 from Funcoes.interface_logger import InterfaceLogger
 from telas.colors import *
-from Funcoes.config import config
-from Funcoes.alert import alert,loading
+from Funcoes.alert import alert, loading
+aluguel = Aluguel()
+cliente = Cliente()
+carro = Carro()
+filial = Filial()
 
-def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
-              arquivo_filial, filial, arquivo_log,):
+
+def data_page(page: ft.Page, arquivo_aluguel, arquivo_cliente, arquivo_carro,
+              arquivo_filial, arquivo_log, ):
     loading_dialog = loading()
     page.dialog = loading_dialog
     loading_dialog.open = False
@@ -23,7 +31,6 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
             cross_axis_margin=10,
         )
     )
-
 
     nome_log = ft.Text(
         size=20,
@@ -102,10 +109,10 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         ],
         )
     )
+    alugueis_text = ft.Text(f"Alugueis: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())
     clientes_text = ft.Text(f"Clientes: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())
     carros_text = ft.Text(f"Carros: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())
     filiais_text = ft.Text(f"Filiais: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())
-    alugueis_text = ft.Text(f"Alugueis: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())
 
     column_left = ft.Column(
         controls=[
@@ -140,7 +147,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
                         ft.Container(
                             ft.Row(
 
-                                controls=[clientes_text, carros_text, filiais_text, alugueis_text],
+                                controls=[alugueis_text, clientes_text, carros_text, filiais_text, ],
                                 alignment=ft.MainAxisAlignment.END,
                                 spacing=20,
                             ),
@@ -149,7 +156,6 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
                             bgcolor=laranja_aviso(),
                             border_radius=ft.border_radius.only(top_left=30, top_right=30),
                         )
-
 
                     ],
                     spacing=0,
@@ -164,19 +170,15 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
     )
 
-
-
     def update_data():
-        num_clientes = cliente.quantidade_registros(arquivo_cliente)
-        num_carros = carro.quantidade_registros(arquivo_carro)
-        num_filiais = filial.quantidade_registros(arquivo_filial)
-        num_alugueis = aluguel.quantidade_registros(arquivo_aluguel)
-        clientes_text.value = f"Clientes: {num_clientes}"
-        carros_text.value = f"Carros: {num_carros}"
-        filiais_text.value = f"Filiais: {num_filiais}"
-        alugueis_text.value = f"Alugueis: {num_alugueis}"
+
+        alugueis_text.value = f"Alugueis: {page.session.get('quantidade_alugueis')}"
+        clientes_text.value = f"Clientes: {page.session.get('quantidade_clientes')}"
+        carros_text.value = f"Carros: {page.session.get('quantidade_carros')}"
+        filiais_text.value = f"Filiais: {page.session.get('quantidade_filiais')}"
         # Atualiza a interface gráfica
         page.update()
+
     update_data()
 
     def open_log():
@@ -207,7 +209,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         loading_dialog.open = True
         page.update()
         button_desordenar.disabled = True
-        config.dados_ordenados = False
+        page.session.set('dados_ordenados', False)
         cliente.desordenar_base(arquivo_cliente)
         carro.desordenar_base(arquivo_carro)
         filial.desordenar_base(arquivo_filial)
@@ -223,7 +225,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         loading_dialog.open = True
         page.update()
         button_ordenar.disabled = True
-        config.dados_ordenados = True
+        page.session.set('bases_ordenadas', True)
         cliente.ordenar_base(arquivo_cliente)
         carro.ordenar_base(arquivo_carro)
         filial.ordenar_base(arquivo_filial)
@@ -260,7 +262,7 @@ def data_page(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente,
         nome_log.update()
         # try:
         button_imprimir.disabled = True
-        entidade.imprimir_base(arquivo, interface_logger,)
+        entidade.imprimir_base(arquivo, interface_logger, )
         # except Exception as e:
         # page.add(alert(mensagem=f"Erro ao imprimir base: {str(e)}", icone="error", cor=laranja_aviso()))
         # page.add(alert(mensagem=f"Escolha uma opção", icone="error", cor=laranja_aviso()))

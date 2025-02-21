@@ -144,7 +144,7 @@ class Aluguel(EntidadeBase):
 
     def imprimir(self, registro):
         if registro.marcador == '*|':
-            return None
+            return
         else:
            return (f"Código: {registro.codigo}\n"
                       f"ID Cliente: {registro.cliente.codigo}\n"
@@ -154,9 +154,7 @@ class Aluguel(EntidadeBase):
                       f"Data do Aluguel: {registro.data_aluguel}\n"
                       f"Tempo: {registro.tempo} {'Dia' if int(registro.tempo) == 1 else 'Dias'}\n"
                       f"Diária: R${registro.diaria}\n"
-                      f"Valor Total: R${registro.valor_total}\n"
-                      f"PROXIMO : {registro.rnn_proximo} \n"
-                      f"MARCADOR : {registro.marcador} ")
+                      f"Valor Total: R${registro.valor_total}\n")
 
 
     def ler_registro(self, arquivo):

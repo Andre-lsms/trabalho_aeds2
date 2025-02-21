@@ -14,6 +14,8 @@ class InterfaceLogger:
 
     def write(self, message, color=telas.colors.texto_padrao(), buffer=1):
         self.buffer_size = buffer
+        if message is None:
+            return
         if message.strip():
             # Armazena no histórico completo
             self.historico.append(

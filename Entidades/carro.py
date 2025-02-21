@@ -85,7 +85,7 @@ class Carro(EntidadeBase):
         return int(struct.calcsize(self.get_formato()))
 
     def exibir_disponiveis(self, arquivo, saida):
-        arquivo.seek(0)
+        arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None and registro_lido.disponivel:
                 saida.write(f"[{registro_lido.codigo}]  {registro_lido.marca} - {registro_lido.modelo},{registro_lido.cor}, {registro_lido.ano}")

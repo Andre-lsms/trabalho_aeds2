@@ -1,21 +1,23 @@
-from time import sleep
 from Entidades import funcoes
+from Entidades.aluguel import Aluguel
+from Entidades.carro import Carro
+from Entidades.clientes import Cliente
+from Entidades.filial import Filial
 from Funcoes.pesquiesa import *
 from telas.templates import *
 from Funcoes.alert import alert,loading
-cliente_busca = None
-carro_busca = None
-filial_busca = None
-registro = None
+
+registro = Aluguel()
+cliente = Cliente()
+carro = Carro()
+filial = Filial()
 
 
-def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
-         arquivo_filial, filial, arquivo_log, tipo_pesquisa=''):
+def home(page: ft.Page,arquivo_aluguel,arquivo_cliente,arquivo_carro,arquivo_filial,arquivo_log):
     page.padding = 0
     loading_dialog = loading()
     page.dialog = loading_dialog
     loading_dialog.open = False
-
 
 
     caixa_pesquisa = ft.TextField(
@@ -27,7 +29,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
         prefix_text='#',
         disabled=False,
         bgcolor=fundo_neutro(),
-        on_submit=lambda e: busca(e, tipo_pesquisa, arquivo_log),
+        on_submit=lambda e: busca(e, arquivo_log),
         border_radius=10,
         border_width=0,
         autofocus=True,
@@ -42,7 +44,7 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
         text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
         weight=ft.FontWeight.BOLD, )),
         height=50,
-        on_click=lambda e: busca(e, tipo_pesquisa, arquivo_log),
+        on_click=lambda e: busca(e, arquivo_log),
     )
     caixa_id_cliente = criar_text_field('Código', 200, 50, prefix_text='#')
     caixa_nome_cliente = criar_text_field('Nome', 410, 50)
@@ -220,21 +222,21 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
         photos_carros.src = f'telas/assets/img/cars/{nome_carro}.png'
         photos_carros.update()
 
-    def busca(e, t_busca, log):
+    def busca(e, log):
         global cliente_busca, carro_busca, filial_busca, registro
         if caixa_pesquisa.value != '':
             loading_dialog.open = True
             page.update()
             try:
                 id = int(caixa_pesquisa.value)
-                if t_busca == 'Binaria':
-                    registro = pesquisa_binaria(id, arquivo_aluguel, aluguel, arquivo_log)
+                if page.session.get('tipo_pesquisa') == 'Binaria':
+                    registro = pesquisa_binaria(id, arquivo_aluguel, Aluguel(), arquivo_log)
                     if registro != -1:
                         cliente_busca = funcoes.pesquisa_binaria(registro.cliente.codigo, arquivo_cliente, cliente, log)
                         carro_busca = funcoes.pesquisa_binaria(registro.carro.codigo, arquivo_carro, carro, log)
                         filial_busca = pesquisa_binaria(registro.filial.codigo, arquivo_filial, filial, log)
                 else:
-                    registro = pesquisa_sequencial(id, arquivo_aluguel, aluguel, arquivo_log)
+                    registro = pesquisa_sequencial(id, arquivo_aluguel, Aluguel(), arquivo_log)
                     if registro != -1:
                         cliente_busca = pesquisa_sequencial(registro.cliente.codigo, arquivo_cliente, cliente, log)
                         carro_busca = pesquisa_sequencial(registro.carro.codigo, arquivo_carro, carro, log)
@@ -316,7 +318,36 @@ def home(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arqu
                 page.update()
 
     def devolver():
-        aluguel.excluir_registro(arquivo_aluguel, registro)
+        page.session.set("quantidade_alugueis", page.session.get("quantidade_alugueis") - 1)
+        registro.excluir_registro(arquivo_aluguel, registro)
+        carro_busca.disponivel = True
+        carro_busca.sobrescrever(arquivo_carro, carro_busca)
+        limpar_caixas(caixa_nome_cliente)
+        limpar_caixas(caixa_id_cliente)
+        limpar_caixas(caixa_cpf_cliente)
+        limpar_caixas(caixa_idade_cliente)
+        limpar_caixas(caixa_endereco_cliente)
+        limpar_caixas(caixa_telefone_cliente)
+        limpar_caixas(caixa_email_cliente)
+        limpar_caixas(caixa_id_carro)
+        limpar_caixas(caixa_marca_carro)
+        limpar_caixas(caixa_modelo_carro)
+        limpar_caixas(caixa_cor_carro)
+        limpar_caixas(caixa_ano_carro)
+        limpar_caixas(caixa_placa_carro)
+        limpar_caixas(caixa_valor_diaria)
+        limpar_caixas(caixa_id_filial)
+        limpar_caixas(caixa_nome_filial)
+        limpar_caixas(caixa_endereco_filial)
+        limpar_caixas(caixa_telefone_filial)
+        limpar_caixas(caixa_email_filial)
+        limpar_caixas(caixa_data_aluguel)
+        limpar_caixas(caixa_tempo)
+        limpar_caixas(caixa_valor_total)
+        botao_devolver.visible = False
+        update_img("default")
+        page.update()
+        page.add(alert(mensagem="Devolução realizada com sucesso", icone="SUCCESS"))
 
     def limpar_caixas(caixa):
         caixa.value = ''

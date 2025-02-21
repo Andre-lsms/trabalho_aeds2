@@ -2,6 +2,7 @@ import struct
 import time
 from random import shuffle
 from faker import Faker
+from colorama import Style, Fore
 
 fake = Faker('pt_BR')
 
@@ -29,7 +30,6 @@ class EntidadeBase:
         raise NotImplementedError("Subclasses devem implementar o método imprimir_registro")
 
     def criar_base(self, tamanho, desordenada=True, **kwargs):
-        from colorama import Style, Fore
 
         arquivo = kwargs.get('arquivo')
 
@@ -54,10 +54,7 @@ class EntidadeBase:
             buffer = 5000
         arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
-
-            if registro_lido is not None and registro_lido != -1:
-                print(self.imprimir(registro_lido))
-                print(95 * "_")
+            if registro_lido is not None:
                 log.write(self.imprimir(registro_lido),buffer=buffer)
     def tamanho_registro(self):
         raise NotImplementedError("Subclasses devem implementar o método tamanho_registro")
@@ -85,6 +82,7 @@ class EntidadeBase:
         registro.salvar_registro(arquivo, registro)
 
     def desordenar_base(self, arquivo):
+        t_inicio = time.time()
         # Lê todos os registros do arquivo e armazena em uma lista
         registros = []
         arquivo.seek(4)  # Volta para o início do arquivo
@@ -102,7 +100,8 @@ class EntidadeBase:
         for registro in registros:
             self.salvar_registro(arquivo, registro)
 
-        print("Base desordenada com sucesso!")
+        print(f'{Fore.YELLOW}Base desordenada com sucesso! tempo de execução:{time.time() - t_inicio} ...{Style.RESET_ALL}')
+
 
     def ordenar_base(self, arquivo):
         t_inicio = time.time()
@@ -123,9 +122,11 @@ class EntidadeBase:
         # Apaga o conteúdo antigo
 
         for registro in registros:
-            self.salvar_registro(arquivo, registro)  # Salva corretamente cada registro
 
-        print(f"Base ordenada com sucesso! tempo de execução:{time.time() - t_inicio} ")
+            self.salvar_registro(arquivo, registro)  # Salva corretamente cada registro
+        print(f'{Fore.YELLOW}Base ordenada com sucesso! tempo de execução:{time.time() - t_inicio} ...{Style.RESET_ALL}')
+
+
 
     # def ordenar_base(self, arquivo):
     #     # Lê todos os registros do arquivo e armazena em uma lista

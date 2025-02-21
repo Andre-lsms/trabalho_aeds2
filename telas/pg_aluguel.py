@@ -3,6 +3,7 @@ import datetime
 import flet as ft
 
 from Entidades import funcoes
+from Entidades.aluguel import Aluguel
 from Funcoes.interface_logger import InterfaceLogger
 from telas.colors import *
 from Funcoes.pesquiesa import *
@@ -12,13 +13,13 @@ from Entidades.filial import Filial
 from telas.templates import criar_text_field
 from Funcoes.alert import alert, loading
 
-registro_cliente = Cliente()
-registro_carro = Carro()
-registro_filial = Filial()
+aluguel = Aluguel()
+cliente = Cliente()
+carro = Carro()
+filial = Filial()
 
-
-def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, cliente, arquivo_carro, carro,
-                  arquivo_filial, filial, arquivo_log, tipo_pesquisa=''):
+def criar_aluguel(page: ft.Page, arquivo_aluguel, arquivo_cliente, arquivo_carro,
+                  arquivo_filial, arquivo_log):
     loading_dialog = loading()
     page.dialog = loading_dialog
     loading_dialog.open = False
@@ -50,7 +51,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         border_width=0,
         autofocus=True,
         input_filter=ft.NumbersOnlyInputFilter(),
-        on_submit=lambda e: buscar_cliente(e, tipo_pesquisa, arquivo_log)
+        on_submit=lambda e: buscar_cliente(e, arquivo_log)
     )
     botao_pesquisa_cliente = ft.ElevatedButton(
         text='Buscar',
@@ -61,7 +62,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                              text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
                                                      weight=ft.FontWeight.BOLD, )),
         height=50,
-        on_click=lambda e: buscar_cliente(e, tipo_pesquisa, arquivo_log)
+        on_click=lambda e: buscar_cliente(e, arquivo_log)
     )
     caixa_id_carro = ft.TextField(
         label='Código',
@@ -76,7 +77,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         border_width=0,
         autofocus=True,
         input_filter=ft.NumbersOnlyInputFilter(),
-        on_submit=lambda e: buscar_carro(e, tipo_pesquisa, arquivo_log)
+        on_submit=lambda e: buscar_carro(e, arquivo_log)
     )
     botao_pesquisa_carro = ft.ElevatedButton(
         text='Buscar',
@@ -87,7 +88,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                              text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
                                                      weight=ft.FontWeight.BOLD, )),
         height=50,
-        on_click=lambda e: buscar_carro(e, tipo_pesquisa, arquivo_log)
+        on_click=lambda e: buscar_carro(e, arquivo_log)
     )
     caixa_id_filial = ft.TextField(
         label='Código',
@@ -102,7 +103,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         border_width=0,
         autofocus=True,
         input_filter=ft.NumbersOnlyInputFilter(),
-        on_submit=lambda e: buscar_filial(e, tipo_pesquisa, arquivo_log)
+        on_submit=lambda e: buscar_filial(e, arquivo_log)
     )
     botao_pesquisa_filial = ft.ElevatedButton(
         text='Buscar',
@@ -113,7 +114,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                              text_style=ft.TextStyle(color=texto_padrao(), size=16, font_family='Inter',
                                                      weight=ft.FontWeight.BOLD, )),
         height=50,
-        on_click=lambda e: buscar_filial(e, tipo_pesquisa, arquivo_log)
+        on_click=lambda e: buscar_filial(e, arquivo_log)
     )
     caixa_id_aluguel = ft.TextField(
         label='Código',
@@ -128,7 +129,7 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
         border_width=0,
         autofocus=True,
         input_filter=ft.NumbersOnlyInputFilter(),
-        on_submit=lambda e: buscar_filial(e, tipo_pesquisa, arquivo_log)
+        on_submit=lambda e: buscar_filial(e, arquivo_log)
     )
 
     caixa_nome_cliente = criar_text_field('Nome', 410, 50)
@@ -411,17 +412,17 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
 
             page.add(alert(mensagem="Digite um numero", icone="ERROR"))
 
-    def buscar_cliente(e, t_busca, log):
+    def buscar_cliente(e, log):
         if caixa_id_cliente.value != '':
             loading_dialog.open = True
             page.update()
             id = caixa_id_cliente.value
             try:
                 id = int(id)
-                if t_busca == 'Binaria':
-                    registro = pesquisa_binaria(id, arquivo_cliente, cliente, log)
+                if page.session.get('tipo_pesquisa') == 'Binaria':
+                    registro = pesquisa_binaria(id, arquivo_cliente, Cliente(), log)
                 else:
-                    registro = pesquisa_sequencial(id, arquivo_cliente, cliente, log)
+                    registro = pesquisa_sequencial(id, arquivo_cliente, Cliente(), log)
                 if registro == -1:
                     limpar_caixas(caixa_nome_cliente)
                     limpar_caixas(caixa_cpf_cliente)
@@ -445,17 +446,17 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 loading_dialog.open = False
                 page.update()
 
-    def buscar_carro(e, t_busca, log):
+    def buscar_carro(e, log):
         if caixa_id_carro.value != '':
             loading_dialog.open = True
             page.update()
             id = caixa_id_carro.value
             try:
                 id = int(id)
-                if t_busca == 'Binaria':
-                    registro = pesquisa_binaria(id, arquivo_carro, carro, log)
+                if page.session.get('tipo_pesquisa') == 'Binaria':
+                    registro = pesquisa_binaria(id, arquivo_carro, Carro(), log)
                 else:
-                    registro = pesquisa_sequencial(id, arquivo_carro, carro, log)
+                    registro = pesquisa_sequencial(id, arquivo_carro, Carro(), log)
 
                 if registro == -1:
                     limpar_caixas(caixa_marca_carro)
@@ -497,17 +498,17 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                 loading_dialog.open = False
                 page.update()
 
-    def buscar_filial(e, t_busca, log):
+    def buscar_filial(e, log):
         if caixa_id_filial.value != '':
             loading_dialog.open = True
             page.update()
             id = caixa_id_filial.value
             try:
                 id = int(id)
-                if t_busca == 'Binaria':
-                    registro = pesquisa_binaria(id, arquivo_filial, filial, log)
+                if page.session.get('tipo_pesquisa') == 'Binaria':
+                    registro = pesquisa_binaria(id, arquivo_filial, Filial(), log)
                 else:
-                    registro = pesquisa_sequencial(id, arquivo_filial, filial, log)
+                    registro = pesquisa_sequencial(id, arquivo_filial, Filial(), log)
 
                 if registro == -1:
                     limpar_caixas(caixa_nome_filial)
@@ -547,7 +548,8 @@ def criar_aluguel(page: ft.Page, arquivo_aluguel, aluguel, arquivo_cliente, clie
                                                   data_aluguel=data_aluguel, tempo=tempo,
                                                   valor_total=valor_total, diaria=diaria, arquivo_carro=arquivo_carro, )
 
-                aluguel.salvar_registro(arquivo=arquivo_aluguel, registro=registro)
+                aluguel.adicionar_registro(arquivo_aluguel, registro)
+                page.session.set("quantidade_alugueis", page.session.get("quantidade_alugueis") + 1)
                 page.add(alert(mensagem="Aluguel criado com sucesso", icone="done", cor=texto_padrao()))
                 limpar_caixas(caixa_id_cliente)
                 limpar_caixas(caixa_nome_cliente)

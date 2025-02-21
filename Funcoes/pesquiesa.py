@@ -10,6 +10,8 @@ def pesquisa_sequencial(id,arquivo,entidade,log):
     comparacoes = 0
     for i in range(quant_arquivos):
         registro = entidade.ler_registro(arquivo)
+        if registro is None:
+            print(f"ERRO: Nenhum registro lido na posição {arquivo.tell()}")
         comparacoes += 1
         if registro.codigo == id:
             log.write('\n' +95*"_")
@@ -26,14 +28,16 @@ def pesquisa_binaria(id, arquivo, entidade, log):
     quant_arquivos = tamanho // entidade.tamanho_registro()
     t_inicio = time()
     comparacoes = 0
-    arquivo.seek(4)
     inicio = 0
     fim = quant_arquivos - 1
     while inicio <= fim:
         meio = (inicio + fim) // 2
-        arquivo.seek((meio * entidade.tamanho_registro()))
+        arquivo.seek((meio * entidade.tamanho_registro())+4)
         registro = entidade.ler_registro(arquivo)
+        if registro is None:
+            print(f"ERRO: Nenhum registro lido na posição {arquivo.tell()}")
         comparacoes += 1
+
         if registro.codigo == id:
             log.write('\n' + 95 * "_")
             log.write(f"\nRegistro [{id}] encontrado - [Busca Binária =={entidade.nome_classe}==]")
