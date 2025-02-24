@@ -233,8 +233,6 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log):
                 loading_dialog.open = False
                 page.update()
     def salvar_edicao(e):
-        posicao = arquivo_cliente.tell() - Cliente().tamanho_registro()
-        arquivo_cliente.seek(posicao)
         nome = caixa_nome_cliente.value
         idade = int(caixa_idade_cliente.value)
         cpf = caixa_cpf_cliente.value
@@ -251,7 +249,7 @@ def pg_clientes(page: ft.Page, arquivo_cliente, arquivo_log):
         else:
             registro = Cliente().criar_registro(int(caixa_id_cliente.value), nome=nome, idade=idade, cpf=cpf,
                                           endereco=endereco, telefone=telefone, email=email)
-            Cliente().salvar_registro(registro=registro, arquivo=arquivo_cliente)
+            Cliente().sobrescrever(arquivo_cliente, registro)
             caixa_idade_cliente.value = ''
             caixa_nome_cliente.value = ''
             caixa_cpf_cliente.value = ''

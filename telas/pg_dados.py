@@ -98,15 +98,17 @@ def data_page(page: ft.Page, arquivo_aluguel, arquivo_cliente, arquivo_carro,
     selection = ft.RadioGroup(
         content=ft.Row([
             ft.Radio(value="Alugueis", label="Alugueis", active_color=laranja_aviso(),
-                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD)),
+                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD),fill_color=laranja_aviso()),
             ft.Radio(value="Clientes", label="Clientes", active_color=laranja_aviso(),
-                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD)),
+                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD),fill_color=laranja_aviso()),
             ft.Radio(value="Carros", label="Carros", active_color=laranja_aviso(),
-                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD)),
+                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD),fill_color=laranja_aviso()),
             ft.Radio(value="Filiais", label="Filiais", active_color=laranja_aviso(),
-                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD, )),
+                     label_style=ft.TextStyle(color=texto_padrao(), weight=ft.FontWeight.BOLD),fill_color=laranja_aviso()),
+
 
         ],
+
         )
     )
     alugueis_text = ft.Text(f"Alugueis: {0}", size=16, weight=ft.FontWeight.BOLD, color=texto_padrao())

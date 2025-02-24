@@ -75,7 +75,7 @@ def main(page: ft.Page):
         controls=[
             ft.Column(
                 [
-                    ft.Text("NOME DA LOCADORA", size=38, weight=ft.FontWeight.BOLD),
+                    ft.Text("NOME DA LOCADORA", size=38, weight=ft.FontWeight.BOLD,color=botao_laranja()),
                 ],
                 spacing=0,
                 tight=True,
@@ -98,25 +98,30 @@ def main(page: ft.Page):
             width=5,  # Espessura da borda
         ),
         label_color=botao_laranja(),
-        unselected_label_text_style=ft.TextStyle(color=fundo(), size=12, weight=ft.FontWeight.BOLD),
+        unselected_label_text_style=ft.TextStyle(color = texto_padrao(), size=12, weight=ft.FontWeight.BOLD),
         divider_color=ft.Colors.TRANSPARENT,
+        unselected_label_color=texto_padrao(),
     )
 
     opcoes = ft.Dropdown(
         label='Tipo de busca',
-        border_color=texto_padrao(),
         hint_text="Sequencial",
-        on_change=lambda e: validar_opcao(e),  # Chama a função para validar a opção
+        value='Sequencial',
+        border_color=botao_laranja(),
         width=300,
         border_radius=10,
+        error_text="",  # Inicialmente sem erro
+        color=texto_padrao(),
+        error_style=ft.TextStyle(color=laranja_aviso(), size=12, weight=ft.FontWeight.BOLD),
+        label_style=ft.TextStyle(color=texto_padrao(), size=12, weight=ft.FontWeight.BOLD),
+        bgcolor=fundo(),
+        icon_enabled_color=botao_laranja(),
 
-        value='Sequencial',
         options=[
             ft.dropdown.Option("Sequencial"),
             ft.dropdown.Option("Binaria"),
         ],
-        error_text="",  # Inicialmente sem erro
-        error_style=ft.TextStyle(color=laranja_aviso(), size=12, weight=ft.FontWeight.BOLD),
+        on_change=lambda e: validar_opcao(e),  # Chama a função para validar a opção
 
     )
     sort_bar = ft.Row(controls=[opcoes])
