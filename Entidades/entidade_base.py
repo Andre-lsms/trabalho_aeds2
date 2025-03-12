@@ -189,24 +189,31 @@ class EntidadeBase:
                     arquivo.startswith('particao_') and arquivo.endswith('.dat')]
 
         qnt_arquivos = len(arquivos)
-        print(f'qnt_arquivos = {qnt_arquivos}')
-        num_part = 0
-        particoes = []
-        while qnt_arquivos >1:
-            for i in range(f-1,):
-                print(f'arquivo {arquivos[num_part]}')
-                particoes.append(open(f'{caminho}/{arquivos[num_part]}', 'r+b'))
-                num_part += 1
-            print(f'daiu do loop {num_part}')
-            saida = open(f'{caminho}/particao_{qnt_arquivos}.dat', 'w+b')
-            print(f'saida {saida}')
+        num_part = qnt_arquivos
+        while qnt_arquivos > 1:
+            particoes = []
+            for i in range(min(f - 1, qnt_arquivos)):
+                if i < len(arquivos):
+                    particoes.append(open(f'{caminho}/{arquivos[i]}', 'r+b'))
+            saida = open(f'{caminho}/particao_{num_part}.dat', 'w+b')
             saida.write(struct.pack('i', -1))
-            self.intercalacao_basica(particoes,saida)
-          
-            print(f'qnt_arquivos = {qnt_arquivos}')
-            arquivos = arquivos[f:]
+            self.intercalacao_basica(particoes, saida)
+            saida.close()
+            num_part += 1
+            qnt_arquivos = len(arquivos)
+
+            arquivos = arquivos[min(f - 1, qnt_arquivos):] + [f'particao_{num_part - 1}.dat']
         if qnt_arquivos == 1:
-            shutil.copy(f'{caminho}/{arquivos[0]}', f'{caminho}/particao_{num_part}.dat')
+
+            origem = f'{caminho}/{arquivos[0]}'  # Caminho do arquivo original
+            destino = f'Bases/{self.__class__.__name__}.dat'  # Novo caminho e nome
+            # Criar a pasta de destino se não existir
+            os.makedirs(os.path.dirname(destino), exist_ok=True)
+
+            # Mover e renomear o arquivo
+            shutil.move(origem, destino)
+
+
 
         # while qnt_arquivos !=1:
 
@@ -228,7 +235,7 @@ class EntidadeBase:
                 print(f'Arquivo {arquivos} vazio')
                 print(f'registro {registro}')
                 arquivos.append((None,None))
-                # os.remove(arquivo_path)
+                os.remove(arquivo.name)
 
         while not fim:
             menor = None
@@ -248,6 +255,7 @@ class EntidadeBase:
                     arquivos[pos_menor] = (arquivos[pos_menor][0], novo_registro)
                 else:
                     arquivos[pos_menor][0].close()
+                    os.remove(arquivos[pos_menor][0].name)
                     arquivos[pos_menor] = (None, None)
 
         for i in range(num_p):
@@ -256,9 +264,24 @@ class EntidadeBase:
 
     def imprimir_codigos(self, arquivo):
         arquivo.seek(4)  # Pular os primeiros 4 bytes, como no seu código original
+        codigos = []
+
+        # Lê os registros e coleta os códigos
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
-                print(registro_lido.codigo, end='|')  # Impede a quebra de linha, imprimindo os códigos em sequência
+                codigos.append(registro_lido.codigo)
+
+        # Exibe os códigos em formato de matriz
+        if codigos:
+            # Define a quantidade de códigos por linha
+            colunas = 10
+            linhas = [codigos[i:i + colunas] for i in range(0, len(codigos), colunas)]  # Cria as linhas de código
+
+            # Imprime os códigos de forma organizada
+            for linha in linhas:
+                print("  ".join(f"{codigo:>6}" for codigo in linha))  # Formata cada número alinhado
+        else:
+            print("⚠️  Não há códigos para exibir!")
 
     def imprimir_todas_particoes(self):
         caminho = f'Bases/Particoes/{self.__class__.__name__}'
@@ -270,5 +293,10 @@ class EntidadeBase:
                     quantidade = self.quantidade_registros(arquivo)
 
                     print(f'Conteúdo da {nome_arquivo}: [{quantidade} ]')
-                    # self.imprimir_codigos(arquivo)
+                    self.imprimir_codigos(arquivo)
                     print()  # Linha em branco para separar as partições
+
+    def ordenar_base(self, arquivo, m):
+        self.selecao_natural(arquivo, m)
+        self.intercalacao_otima(m)
+        print(f'Base {self.__class__.__name__} ordenada com sucesso!')

@@ -227,7 +227,3 @@ class Aluguel(EntidadeBase):
         registro_lido = entidade.ler_registro(arquivo)
         return registro_lido
 
-    def ordenar_base(self, arquivo):
-        arquivo.seek(0)
-        arquivo.write(struct.pack('i', -1))
-        super().ordenar_base(arquivo)
