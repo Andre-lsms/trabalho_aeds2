@@ -61,6 +61,7 @@ class Cliente(EntidadeBase):
         try:
             registro_bytes = arquivo.read(self.tamanho_registro())
             if len(registro_bytes) < self.tamanho_registro():
+
                 return None
 
             registro = struct.unpack(self.get_formato(), registro_bytes)

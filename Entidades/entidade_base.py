@@ -1,3 +1,5 @@
+import os
+import shutil
 import struct
 import time
 from random import shuffle
@@ -24,7 +26,7 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método ler_registro")
 
-    def imprimir(self, registro,):
+    def imprimir(self, registro, ):
         """
         Subclasses devem implementar este método para imprimir o registro.
         """
@@ -59,7 +61,7 @@ class EntidadeBase:
     def tamanho_arquivo(arquivo):
         arquivo.seek(0, 2)
         tamanho = arquivo.tell()
-        return int(tamanho-4)
+        return int(tamanho - 4)
 
     def quantidade_registros(self, arquivo):
         return self.tamanho_arquivo(arquivo) // self.tamanho_registro()
@@ -76,65 +78,197 @@ class EntidadeBase:
         arquivo.seek(posicao - tamanho_registro)
         registro.salvar_registro(arquivo, registro)
 
-    def desordenar_base(self, arquivo):
-        # Lê todos os registros do arquivo e armazena em uma lista
-        registros = []
-        arquivo.seek(4)  # Volta para o início do arquivo
-        while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None and registro_lido != -1:
-                registros.append(registro_lido)
+    import os
+    import shutil
 
-        # Desordena a lista de registros
-        shuffle(registros)
+    import os
+    import shutil
+    import struct
 
-        # Reescreve os registros desordenados no arquivo
-        arquivo.seek(0)  # Volta para o início do arquivo
-        arquivo.truncate()
-        arquivo.write(struct.pack('i', -1))
-        for registro in registros:
-            self.salvar_registro(arquivo, registro)
+    def selecao_natural(self, arquivo, m):
+        caminho = f'Bases/Particoes/{self.__class__.__name__}'
 
-        print("Base desordenada com sucesso!")
+        # Se existir, remove e recria o diretório
+        if os.path.exists(caminho):
+            shutil.rmtree(caminho)
+        os.makedirs(caminho)
+        reservatorio_path = f'{caminho}/reservatorio.dat'
+        if os.path.exists(reservatorio_path):
+            os.remove(reservatorio_path)
+        reservatorio = open(reservatorio_path, 'w+b')
+        reservatorio.write(struct.pack('i', -5))
 
-    def ordenar_base(self, arquivo):
-        t_inicio = time.time()
-        registros = []
-
-        # Lê todos os registros corretamente
+        # Posiciona no início do arquivo (depois do cabeçalho)
         arquivo.seek(4)
+        reservatorio.seek(4)
+
+        registros = []
+        particao_atual = 0
+        arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
+        arquivo_saida.write(struct.pack('i', -1))
+
+        # Cria o arquivo para o reservatório (no disco)
+
+        # 1. Ler M registros do arquivo para a memória
+        for i in range(m):
+            registro = self.ler_registro(arquivo)
+            if registro:
+                registros.append(registro)
+        # print(f'\033[94m[Inicialização]\033[0m Memória = {[r.codigo for r in registros]}')
+
+        ultimo_gravado = None  # Último registro gravado na partição atual
+        while True:
+            # 2. Selecionar, no array em memória, o registro r com menor chave
+            if registros:
+                menor = min(registros, key=lambda x: x.codigo)
+
+                # 3. Gravar o registro r na partição de saída
+                self.salvar_registro(arquivo_saida, menor)
+                ultimo_gravado = menor.codigo
+                registros.remove(menor)
+                # print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}')
+
+                # 4. Substituir, no array em memória, o registro r pelo próximo registro do arquivo de entrada
+                novo_registro = self.ler_registro(arquivo)
+                # print(f'\033[93m[Próximo Registro]\033[0m {novo_registro.codigo if novo_registro else None}')
+                if novo_registro is not None:
+                    if novo_registro.codigo < ultimo_gravado:
+                        self.salvar_registro(reservatorio, novo_registro)
+                        # print(f'\033[91m[MOVIDO PARA RESERVATÓRIO]\033[0m {novo_registro.codigo}')
+                        # print(f'Estado do resevatório:')
+                        # self.imprimir_codigos(reservatorio)
+                    else:
+                        registros.append(novo_registro)
+            else:
+                # print(
+                #     f'\033[96m[Estado Atual]\033[0m Memória = {[r.codigo for r in registros]} | Reservatório = {self.quantidade_registros(reservatorio)} | Último Gravado = {ultimo_gravado}')
+                if not registros and self.quantidade_registros(reservatorio) == 0:
+                    break
+                if self.quantidade_registros(reservatorio) == m or not registros:
+                    # print(f'\033[95m[PARTIÇÃO FECHADA]\033[0m Criando partição {particao_atual + 1}')
+
+                    for i in range(m):
+                        if registros:
+                            menor_atual = min(registros, key=lambda x: x.codigo)
+                            self.salvar_registro(arquivo_saida, menor_atual)
+                            print(f'\033[92m[GRAVADO]\033[0m {menor_atual.codigo} na partição {particao_atual}')
+                            registros.remove(menor_atual)
+
+                    arquivo_saida.close()
+                    particao_atual += 1
+                    arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
+                    arquivo_saida.write(struct.pack('i', -1))
+
+                reservatorio.seek(4)
+                for i in range(m):
+                    reg_reservatorio = self.ler_registro(reservatorio)
+                    # print(f'\033[91m[Reservatório]\033[0m {reg_reservatorio.codigo if reg_reservatorio else None}')
+                    if reg_reservatorio:
+                        registros.append(reg_reservatorio)
+                    else:
+                        break
+
+                    # Limpa o reservatório
+                reservatorio.seek(4)
+                # print(f'\033[94m[LIMPAR RESERVATÓRIO]\033[0m')
+                reservatorio.truncate()
+                ultimo_gravado = None
+
+                if not registros:
+                    break
+        reservatorio.close()
+        if os.path.exists(reservatorio_path):
+            os.remove(reservatorio_path)
+        # print(
+        #     f'\033[94m[FIM]\033[0m Reservatório = {self.quantidade_registros(reservatorio)}, Memória = {len(registros)}')
+
+    def intercalacao_otima(self, f):
+        caminho = f'Bases/Particoes/{self.__class__.__name__}'
+
+        arquivos = [arquivo for arquivo in os.listdir(caminho) if
+                    arquivo.startswith('particao_') and arquivo.endswith('.dat')]
+
+        qnt_arquivos = len(arquivos)
+        print(f'qnt_arquivos = {qnt_arquivos}')
+        num_part = 0
+        particoes = []
+        while qnt_arquivos >1:
+            for i in range(f-1,):
+                print(f'arquivo {arquivos[num_part]}')
+                particoes.append(open(f'{caminho}/{arquivos[num_part]}', 'r+b'))
+                num_part += 1
+            print(f'daiu do loop {num_part}')
+            saida = open(f'{caminho}/particao_{qnt_arquivos}.dat', 'w+b')
+            print(f'saida {saida}')
+            saida.write(struct.pack('i', -1))
+            self.intercalacao_basica(particoes,saida)
+          
+            print(f'qnt_arquivos = {qnt_arquivos}')
+            arquivos = arquivos[f:]
+        if qnt_arquivos == 1:
+            shutil.copy(f'{caminho}/{arquivos[0]}', f'{caminho}/particao_{num_part}.dat')
+
+        # while qnt_arquivos !=1:
+
+
+
+    def intercalacao_basica(self, particoes, saida):
+        num_p = len(particoes)
+        saida.seek(4)
+        fim = 0
+        arquivos = []
+        for i in range(num_p):
+            arquivo = particoes[i]
+            arquivo.seek(4)
+            registro = self.ler_registro(arquivo)
+            if registro:
+                arquivos.append((arquivo, registro))
+            else:
+                arquivo.close()
+                print(f'Arquivo {arquivos} vazio')
+                print(f'registro {registro}')
+                arquivos.append((None,None))
+                # os.remove(arquivo_path)
+
+        while not fim:
+            menor = None
+            pos_menor = None
+            for i in range(num_p):
+                # print(f'menor {arquivos[i][1].codigo}')
+                if arquivos[i] is not None and arquivos[i][1] is not None:
+                    if menor is None or arquivos[i][1].codigo < menor.codigo:
+                        menor = arquivos[i][1]
+                        pos_menor = i
+            if menor is None:
+                fim = 1
+            else:
+                self.salvar_registro(saida, menor)
+                novo_registro = self.ler_registro(arquivos[pos_menor][0])
+                if novo_registro:
+                    arquivos[pos_menor] = (arquivos[pos_menor][0], novo_registro)
+                else:
+                    arquivos[pos_menor][0].close()
+                    arquivos[pos_menor] = (None, None)
+
+        for i in range(num_p):
+            if arquivos[i] and arquivos[i][0]:
+                arquivos[i][0].close()
+
+    def imprimir_codigos(self, arquivo):
+        arquivo.seek(4)  # Pular os primeiros 4 bytes, como no seu código original
         while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None and registro_lido != -1:
-                registros.append(registro_lido)
-        # Ordena corretamente pela chave 'codigo'
-        registros.sort(key=lambda x: x.codigo)
+            if registro_lido is not None:
+                print(registro_lido.codigo, end='|')  # Impede a quebra de linha, imprimindo os códigos em sequência
 
-        # Volta ao início do arquivo e reescreve os registros ordenados
-        arquivo.seek(0)
-        arquivo.truncate()
-        arquivo.write(struct.pack('i', -1))
-        # Apaga o conteúdo antigo
+    def imprimir_todas_particoes(self):
+        caminho = f'Bases/Particoes/{self.__class__.__name__}'
+        arquivos = os.listdir(caminho)
+        for nome_arquivo in arquivos:
+            if nome_arquivo.startswith('particao_') and nome_arquivo.endswith('.dat'):
+                caminho_arquivo = os.path.join(caminho, nome_arquivo)
+                with open(caminho_arquivo, 'r+b') as arquivo:
+                    quantidade = self.quantidade_registros(arquivo)
 
-        for registro in registros:
-            self.salvar_registro(arquivo, registro)  # Salva corretamente cada registro
-
-        print(f"Base ordenada com sucesso! tempo de execução:{time.time() - t_inicio} ")
-
-    # def ordenar_base(self, arquivo):
-    #     # Lê todos os registros do arquivo e armazena em uma lista
-    #     for j in range(1, self.quantidade_registros(arquivo)):
-    #         arquivo.seek(j * self.tamanho_registro())
-    #         registroj = self.ler_registro(arquivo)
-    #         i = j - 1
-    #         arquivo.seek(i * self.tamanho_registro())
-    #         registroi = self.ler_registro(arquivo)
-    #         while i >= 0 and registroi.codigo > registroj.codigo:
-    #             arquivo.seek((i + 1) * self.tamanho_registro())
-    #             self.salvar_registro(arquivo, registroi)
-    #             i = i - 1
-    #             if i >= 0:
-    #                 arquivo.seek(i * self.tamanho_registro())
-    #                 registroi = self.ler_registro(arquivo)
-    #         arquivo.seek((i + 1) * self.tamanho_registro())
-    #         self.salvar_registro(arquivo, registroj)
-    #     print("Base ordenada com sucesso!")
-
+                    print(f'Conteúdo da {nome_arquivo}: [{quantidade} ]')
+                    # self.imprimir_codigos(arquivo)
+                    print()  # Linha em branco para separar as partições

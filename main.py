@@ -1,4 +1,18 @@
+import os
 import struct
+def imprimir_todas_particoes(self):
+    caminho = f'Bases/Particoes/{self.__class__.__name__}'
+    arquivos = os.listdir(caminho)
+    quantidade = len(arquivos)
+    for nome_arquivo in arquivos:
+        if nome_arquivo.startswith('particao_') and nome_arquivo.endswith('.dat'):
+            caminho_arquivo = os.path.join(caminho, nome_arquivo)
+            with open(caminho_arquivo, 'r+b') as arquivo:
+                print(f'Conteúdo da {nome_arquivo}: [{quantidade} ]')
+                self.imprimir_codigos(arquivo)
+                print()  # Linha em branco para separar as partições
+
+
 
 import Funcoes.pesquiesa
 from Entidades.clientes import Cliente
@@ -7,7 +21,7 @@ from Entidades.filial import Filial
 from Entidades.aluguel import Aluguel
 from Funcoes.pesquiesa import *
 
-arquivo_cliente = open('Bases/cliente.dat', 'w+b')
+arquivo_cliente = open('Bases/cliente.dat', 'r+b')
 arquivo_carro = open('Bases/carro.dat', 'w+b')
 arquivo_filial = open('Bases/filial.dat', 'w+b')
 arquivo = open('Bases/aluguel.dat', 'w+b')
@@ -21,48 +35,28 @@ arquivo_carro.write(struct.pack('i', -1))
 arquivo_filial.write(struct.pack('i', -1))
 
 clientes = Cliente()
-carros = Carro()
-filiais = Filial()
-alugueis = Aluguel()
-tam = 5
-clientes.criar_base(tam, arquivo=arquivo_cliente)
-carros.criar_base(12, arquivo=arquivo_carro)
-filiais.criar_base(tam, arquivo=arquivo_filial)
-
-alugueis.criar_base(tam, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
-                    arquivo_filial=arquivo_filial,desordenada=False)
+# carros = Carro()
+# filiais = Filial()
+# alugueis = Aluguel()
+# tam = 100
+# clientes.criar_base(tam, arquivo=arquivo_cliente)
+# # carros.criar_base(tam, arquivo=arquivo_carro)
+# # filiais.criar_base(tam, arquivo=arquivo_filial)
 # #
-# reg1 = Funcoes.pesquiesa.pesquisa_sequencial(1, arquivo, alugueis)
-# alugueis.excluir_registro(arquivo,reg1)
-# reg2 = Funcoes.pesquiesa.pesquisa_sequencial(3, arquivo, alugueis)
-# alugueis.excluir_registro(arquivo,reg2)
+# # alugueis.criar_base(tam, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro,
+# #                     arquivo_filial=arquivo_filial,)
+arquivo_cliente.seek(4)
+
 #
+clientes.selecao_natural(arquivo_cliente, 10)
+# #
+# arquivo =  open('Bases/Particoes/Cliente/saida.dat', 'w+b')
+# arquivo.write(struct.pack('i', -1))
+clientes.intercalacao_otima(4)
+# clientes.imprimir_codigos(arquivo)
+
+
+
+print('\n')
+clientes.imprimir_todas_particoes()
 #
-# #
-# #
-# #
-# alugu = alugueis.criar_registro(123, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
-# alugueis.adicionar_registro(arquivo, alugu)
-# alugu2 = alugueis.criar_registro(124, arquivo_cliente=arquivo_cliente, arquivo_carro=arquivo_carro, arquivo_filial=arquivo_filial)
-# alugueis.adicionar_registro(arquivo, alugu2)
-# alugueis.ordenar_base(arquivo)
-# alugueis.imprimir_base(arquivo)
-
-clientes.ordenar_base(arquivo_cliente)
-filiais.ordenar_base(arquivo_filial)
-carros.ordenar_base(arquivo_carro)
-alugueis.ordenar_base(arquivo)
-
-clientes.desordenar_base(arquivo_cliente)
-filiais.desordenar_base(arquivo_filial)
-carros.desordenar_base(arquivo_carro)
-alugueis.desordenar_base(arquivo)
-
-clientes.imprimir_base(arquivo_cliente)
-filiais.imprimir_base(arquivo_filial)
-carros.imprimir_base(arquivo_carro)
-alugueis.imprimir_base(arquivo)
-
-
-
-
