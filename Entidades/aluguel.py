@@ -200,7 +200,7 @@ class Aluguel(EntidadeBase):
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
 
-        print(f'Gerando a base de daso tamanho {tamanho}...')
+        print(f'Gerando a base de dados tamanho {tamanho}...')
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)

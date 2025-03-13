@@ -9,6 +9,7 @@ from faker import Faker
 fake = Faker('pt_BR')
 
 
+
 class EntidadeBase:
     def __init__(self, ):
         self.fake = fake
@@ -38,7 +39,7 @@ class EntidadeBase:
         if arquivo is None:
             raise ValueError("O arquivo não foi informado")
 
-        print(f'Gerando a base de daso tamanho {tamanho}...')
+        print(f'Gerando a base de dados tamanho {tamanho}...')
         codigos = []
         for i in range(tamanho):
             codigos.append(i + 1)
@@ -72,20 +73,11 @@ class EntidadeBase:
         """
         raise NotImplementedError("Subclasses devem implementar o método get_formato")
 
-    def sobrescrever(self, arquivo, registro):
-        posicao = arquivo.tell()
-        tamanho_registro = registro.tamanho_registro()
-        arquivo.seek(posicao - tamanho_registro)
-        registro.salvar_registro(arquivo, registro)
-
-    import os
-    import shutil
-
-    import os
-    import shutil
-    import struct
-
-    def selecao_natural(self, arquivo, m):
+    def selecao_natural(self, arquivo, m, depuracao=False):
+        global novo_registro
+        leituras = 0
+        escritas = 0
+        t_ini = time.time()
         caminho = f'Bases/Particoes/{self.__class__.__name__}'
 
         # Se existir, remove e recria o diretório
@@ -104,156 +96,268 @@ class EntidadeBase:
 
         registros = []
         particao_atual = 0
+
         arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
         arquivo_saida.write(struct.pack('i', -1))
-
-        # Cria o arquivo para o reservatório (no disco)
 
         # 1. Ler M registros do arquivo para a memória
         for i in range(m):
             registro = self.ler_registro(arquivo)
+            leituras += 1
             if registro:
                 registros.append(registro)
-        # print(f'\033[94m[Inicialização]\033[0m Memória = {[r.codigo for r in registros]}')
 
-        ultimo_gravado = None  # Último registro gravado na partição atual
+        if depuracao:
+            print(
+                f'\033[94m[INICIALIZANDO A MEMÓRIA]\033[0m | \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+
+        # 2. Selecionar, no vetor em memória, o registro r com menor chave
+        menor = min(registros, key=lambda x: x.codigo)
+        # 3. Gravar o registro r na partição de saída
+        self.salvar_registro(arquivo_saida, menor)
+        escritas += 1
+        ultimo_gravado = menor.codigo
+        registros.remove(menor)
+
+        if depuracao:
+            quantidade_digitos = len(str(abs(menor.codigo)))
+            espaco = ' ' * (10 - quantidade_digitos)
+            print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}{espaco}|', end='')
+
         while True:
-            # 2. Selecionar, no array em memória, o registro r com menor chave
             if registros:
-                menor = min(registros, key=lambda x: x.codigo)
+                # 4. Substituir, no vetor em memória, o registro r pelo próximo do arquivo
+                if ultimo_gravado != -1:
+                    novo_registro = self.ler_registro(arquivo)
+                    registros.append(novo_registro) if novo_registro else None
+                    leituras += 1
 
-                # 3. Gravar o registro r na partição de saída
-                self.salvar_registro(arquivo_saida, menor)
-                ultimo_gravado = menor.codigo
-                registros.remove(menor)
-                # print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}')
-
-                # 4. Substituir, no array em memória, o registro r pelo próximo registro do arquivo de entrada
-                novo_registro = self.ler_registro(arquivo)
-                # print(f'\033[93m[Próximo Registro]\033[0m {novo_registro.codigo if novo_registro else None}')
-                if novo_registro is not None:
+                    if depuracao:
+                        print(f' \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+                # 5. Caso a chave do novo registro seja menor que a do último gravado, movê-lo para o reservatório
+                if novo_registro:
                     if novo_registro.codigo < ultimo_gravado:
                         self.salvar_registro(reservatorio, novo_registro)
-                        # print(f'\033[91m[MOVIDO PARA RESERVATÓRIO]\033[0m {novo_registro.codigo}')
-                        # print(f'Estado do resevatório:')
-                        # self.imprimir_codigos(reservatorio)
-                    else:
-                        registros.append(novo_registro)
-            else:
-                # print(
-                #     f'\033[96m[Estado Atual]\033[0m Memória = {[r.codigo for r in registros]} | Reservatório = {self.quantidade_registros(reservatorio)} | Último Gravado = {ultimo_gravado}')
-                if not registros and self.quantidade_registros(reservatorio) == 0:
-                    break
-                if self.quantidade_registros(reservatorio) == m or not registros:
-                    # print(f'\033[95m[PARTIÇÃO FECHADA]\033[0m Criando partição {particao_atual + 1}')
+                        escritas += 1
+                        registros.remove(novo_registro)
+                        if depuracao:
+                            quantidade_digitos = len(str(abs(novo_registro.codigo)))
+                            espaco = ' ' * (7 - quantidade_digitos)
+                            print(f'\033[36m[{novo_registro.codigo} MOVIDO PARA RESERVATÓRIO]\33[0m{espaco}|', end='')
 
-                    for i in range(m):
-                        if registros:
-                            menor_atual = min(registros, key=lambda x: x.codigo)
-                            self.salvar_registro(arquivo_saida, menor_atual)
-                            print(f'\033[92m[GRAVADO]\033[0m {menor_atual.codigo} na partição {particao_atual}')
-                            registros.remove(menor_atual)
+                    else:
+                        menor = min(registros, key=lambda x: x.codigo)
+                        self.salvar_registro(arquivo_saida, menor)
+                        escritas += 1
+                        ultimo_gravado = menor.codigo
+                        registros.remove(menor)
+                        if depuracao:
+                            quantidade_digitos = len(str(abs(menor.codigo)))
+                            espaco = ' ' * (10 - quantidade_digitos)
+                            print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}{espaco}|',
+                                  end='')
+                else:
+                    menor = min(registros, key=lambda x: x.codigo)
+                    self.salvar_registro(arquivo_saida, menor)
+                    escritas += 1
+                    ultimo_gravado = menor.codigo
+                    registros.remove(menor)
+                    if depuracao:
+                        quantidade_digitos = len(str(abs(menor.codigo)))
+                        espaco = ' ' * (10 - quantidade_digitos)
+                        print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}{espaco}|', end='')
+
+            if self.quantidade_registros(reservatorio) == m:
+                if depuracao:
+                    print(f' \033[31m[Reservatório cheio]\033[0m')
+                    print(f'\033[94m[GRAVANDO ARQUIVO DO BUFFER]\033[0m{(6 * " ")}| \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+
+                for i in range(m):
+                    if registros:
+                        menor_atual = min(registros, key=lambda x: x.codigo)
+                        self.salvar_registro(arquivo_saida, menor_atual)
+                        escritas += 1
+                        registros.remove(menor_atual)
+                        if depuracao:
+                            quantidade_digitos = len(str(abs(menor_atual.codigo)))
+                            espaco = ' ' * (10 - quantidade_digitos)
+                            print(
+                                f'\033[92m[GRAVADO]\033[0m {menor_atual.codigo} na partição {particao_atual}{espaco}|',
+                                end='')
+                            print(f' \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+                    else:
+                        break
+
+                arquivo_saida.close()
+                particao_atual += 1
+                arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
+                arquivo_saida.write(struct.pack('i', -1))
+
+                reservatorio.seek(4)
+                for i in range(m):
+                    reg_reservatorio = self.ler_registro(reservatorio)
+                    if reg_reservatorio:
+                        registros.append(reg_reservatorio)
+                    else:
+                        break
+
+                reservatorio.seek(4)
+                reservatorio.truncate()
+                ultimo_gravado = -1
+                if depuracao:
+                    print(f'\033[31m[CLONANDO RESERVATÓRIO]\033[0m {10* " "}| \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+
+            if not registros:
+                if self.quantidade_registros(reservatorio) > 0:
+                    if depuracao:
+                        print(f'\n\033[33m[ESVAZIANDO RESERVATÓRIO ANTES DE FINALIZAR]\033[0m')
+
+                    reservatorio.seek(4)
+                    while True:
+                        reg_reservatorio = self.ler_registro(reservatorio)
+                        if not reg_reservatorio:
+                            break
+                        registros.append(reg_reservatorio)
 
                     arquivo_saida.close()
                     particao_atual += 1
                     arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
                     arquivo_saida.write(struct.pack('i', -1))
 
-                reservatorio.seek(4)
-                for i in range(m):
-                    reg_reservatorio = self.ler_registro(reservatorio)
-                    # print(f'\033[91m[Reservatório]\033[0m {reg_reservatorio.codigo if reg_reservatorio else None}')
-                    if reg_reservatorio:
-                        registros.append(reg_reservatorio)
-                    else:
-                        break
+                    while registros:
+                        menor = min(registros, key=lambda x: x.codigo)
+                        self.salvar_registro(arquivo_saida, menor)
+                        registros.remove(menor)
+                        if depuracao:
+                            quantidade_digitos = len(str(abs(menor.codigo)))
+                            espaco = ' ' * (10 - quantidade_digitos)
+                            print(f'\033[92m[GRAVADO]\033[0m {menor.codigo} na partição {particao_atual}{espaco}|',
+                                  end='')
+                            print(f' \033[94m[Memória]\033[0m = {[r.codigo for r in registros]}')
+                if depuracao:
+                    print(f'\033[31m[REGISTROS ESGOTADOS]\033[0m')
+                break
 
-                    # Limpa o reservatório
-                reservatorio.seek(4)
-                # print(f'\033[94m[LIMPAR RESERVATÓRIO]\033[0m')
-                reservatorio.truncate()
-                ultimo_gravado = None
-
-                if not registros:
-                    break
         reservatorio.close()
         if os.path.exists(reservatorio_path):
             os.remove(reservatorio_path)
-        # print(
-        #     f'\033[94m[FIM]\033[0m Reservatório = {self.quantidade_registros(reservatorio)}, Memória = {len(registros)}')
-
-    def intercalacao_otima(self, f):
+        if depuracao:
+            print(f'Quantidade de leituras: {leituras}')
+            print(f'Quantidade de escritas: {escritas}')
+            print(f'Tempo de execução: {time.time() - t_ini:.2f} segundos')
+        return leituras, escritas, time.time() - t_ini
+    def intercalacao_otima(self, f, depuracao=False):
+        leituras = 0
+        escritas = 0
+        tempo_total = 0
         caminho = f'Bases/Particoes/{self.__class__.__name__}'
-
         arquivos = [arquivo for arquivo in os.listdir(caminho) if
                     arquivo.startswith('particao_') and arquivo.endswith('.dat')]
-
         qnt_arquivos = len(arquivos)
         num_part = qnt_arquivos
-        while qnt_arquivos > 1:
+
+        if depuracao:
+            print('\033[94m[INICIANDO INTERCALAÇÃO ÓTIMA]\033[0m')
+
+        while qnt_arquivos != 1:
             particoes = []
             for i in range(min(f - 1, qnt_arquivos)):
                 if i < len(arquivos):
                     particoes.append(open(f'{caminho}/{arquivos[i]}', 'r+b'))
+
             saida = open(f'{caminho}/particao_{num_part}.dat', 'w+b')
             saida.write(struct.pack('i', -1))
-            self.intercalacao_basica(particoes, saida)
+
+            if depuracao:
+                print(f'\033[96m[INTERCALANDO]\033[0m {len(particoes)} partições')
+
+            leituras_atuais, escritas_atuais,tempo_atuais  = self.intercalacao_basica(particoes, saida, depuracao)
+            leituras += leituras_atuais
+            escritas += escritas_atuais
+            tempo_total += tempo_atuais
+
+            for arquivo in particoes:
+                arquivo.close()
+
             saida.close()
             num_part += 1
-            qnt_arquivos = len(arquivos)
 
             arquivos = arquivos[min(f - 1, qnt_arquivos):] + [f'particao_{num_part - 1}.dat']
+            qnt_arquivos = len(arquivos)
+
+            if depuracao:
+                print(f'\033[93m[NOVA PARTIÇÃO CRIADA]\033[0m particao_{num_part - 1}.dat')
+
         if qnt_arquivos == 1:
-
-            origem = f'{caminho}/{arquivos[0]}'  # Caminho do arquivo original
-            destino = f'Bases/{self.__class__.__name__}.dat'  # Novo caminho e nome
-            # Criar a pasta de destino se não existir
+            origem = f'{caminho}/{arquivos[0]}'
+            destino = f'Bases/{self.__class__.__name__}.dat'
             os.makedirs(os.path.dirname(destino), exist_ok=True)
-
-            # Mover e renomear o arquivo
             shutil.move(origem, destino)
 
+            if depuracao:
+                print(f'\033[92m[INTERCALAÇÃO COMPLETA]\033[0m Arquivo final movido para {destino}')
+                print(f'\033[94m[LEITURAS]\033[0m: {leituras}')
+                print(f'\033[94m[ESCRITAS]\033[0m: {escritas}')
+                print(f'\033[94m[TEMPO TOTAL]\033[0m: {tempo_total:.2f} segundos')
+        return leituras, escritas,tempo_total
 
-
-        # while qnt_arquivos !=1:
-
-
-
-    def intercalacao_basica(self, particoes, saida):
+    def intercalacao_basica(self, particoes, saida, depuracao=False):
         num_p = len(particoes)
         saida.seek(4)
         fim = 0
         arquivos = []
+        leituras = 0
+        escritas = 0
+        t_ini = time.time()
+
+        if depuracao:
+            print('\033[94m[INICIANDO INTERCALAÇÃO BÁSICA]\033[0m')
+
+        # carrega o primeiro registro de cada arquivo
         for i in range(num_p):
-            arquivo = particoes[i]
-            arquivo.seek(4)
-            registro = self.ler_registro(arquivo)
+            particoes[i].seek(4)
+            registro = self.ler_registro(particoes[i])
+            leituras += 1
             if registro:
-                arquivos.append((arquivo, registro))
+                arquivos.append((particoes[i], registro))
+                if depuracao:
+                    print(f'\033[96m[CARREGADO]\033[0m Registro {registro.codigo} do arquivo {particoes[i].name}')
             else:
-                arquivo.close()
-                print(f'Arquivo {arquivos} vazio')
-                print(f'registro {registro}')
-                arquivos.append((None,None))
-                os.remove(arquivo.name)
+                particoes[i].close()
+                if depuracao:
+                    print(f'\033[91m[ARQUIVO VAZIO]\033[0m {particoes[i].name} removido')
+                arquivos.append((None, None))
+                os.remove(particoes[i].name)
 
         while not fim:
             menor = None
             pos_menor = None
             for i in range(num_p):
-                # print(f'menor {arquivos[i][1].codigo}')
                 if arquivos[i] is not None and arquivos[i][1] is not None:
                     if menor is None or arquivos[i][1].codigo < menor.codigo:
                         menor = arquivos[i][1]
                         pos_menor = i
+
             if menor is None:
                 fim = 1
+                if depuracao:
+                    print('\033[91m[INTERCALAÇÃO FINALIZADA]\033[0m Nenhum registro restante')
             else:
-                self.salvar_registro(saida, menor)
+                self.salvar_registro(saida, arquivos[pos_menor][1])
+                escritas += 1
+                if depuracao:
+                    print(f'\033[92m[GRAVADO]\033[0m Registro {menor.codigo} na saída')
+
                 novo_registro = self.ler_registro(arquivos[pos_menor][0])
+                leituras += 1
                 if novo_registro:
                     arquivos[pos_menor] = (arquivos[pos_menor][0], novo_registro)
+                    if depuracao:
+                        print(
+                            f'\033[96m[NOVO REGISTRO]\033[0m {novo_registro.codigo} carregado de {arquivos[pos_menor][0].name}')
                 else:
+                    if depuracao:
+                        print(f'\033[91m[ARQUIVO ENCERRADO]\033[0m {arquivos[pos_menor][0].name} removido')
                     arquivos[pos_menor][0].close()
                     os.remove(arquivos[pos_menor][0].name)
                     arquivos[pos_menor] = (None, None)
@@ -261,6 +365,70 @@ class EntidadeBase:
         for i in range(num_p):
             if arquivos[i] and arquivos[i][0]:
                 arquivos[i][0].close()
+                if depuracao:
+                    print(f'\033[93m[FECHANDO ARQUIVO]\033[0m {arquivos[i][0].name}')
+
+        return leituras, escritas , time.time() - t_ini
+
+    def bubble_sort(self, arquivo, depuracao=False):
+        quantidade = self.quantidade_registros(arquivo)
+        leituras = 0
+        escritas = 0
+        t_ini = time.time()
+
+        # Realiza a ordenação por Bubble Sort
+        for i in range(quantidade - 1):
+            trocou = False
+            for j in range(quantidade - i - 1):
+                # Lê os registros nas posições j e j+1
+                arquivo.seek(4 + j * self.tamanho_registro())
+                registro_atual = self.ler_registro(arquivo)
+                leituras += 1
+
+                arquivo.seek(4 + (j + 1) * self.tamanho_registro())
+                registro_proximo = self.ler_registro(arquivo)
+                leituras += 1
+
+                # Depuração
+                if depuracao:
+                    print(
+                        f"\033[94m[COMPARANDO]\033[0m Registro {registro_atual.codigo} com Registro {registro_proximo.codigo}")
+
+                # Se o registro atual for maior que o próximo, realiza a troca
+                if registro_atual.codigo > registro_proximo.codigo:
+                    # Troca os registros diretamente no arquivo
+                    self.trocar_registros(arquivo, j, j + 1, registro_atual, registro_proximo)
+                    escritas += 2  # Contabilizando as escritas
+
+                    # Depuração
+                    if depuracao:
+                        print(f"\033[92m[TROCANDO]\033[0m {registro_atual.codigo} com {registro_proximo.codigo}")
+
+                    trocou = True
+
+            # Se não houve troca, a lista já está ordenada
+            if not trocou:
+                break
+
+        # Depuração de leituras e escritas ao final
+        tempo_total = time.time() - t_ini
+        if depuracao:
+            print(f'\033[94m[LEITURAS]\033[0m: {leituras}')
+            print(f'\033[94m[ESCRITAS]\033[0m: {escritas}')
+            print(f'\033[94m[TEMPO TOTAL]\033[0m: {tempo_total:.2f} segundos')
+
+        return leituras, escritas, tempo_total
+    def trocar_registros(self, arquivo, posicao1, posicao2, registro1, registro2):
+        """
+        Troca os registros nas posições especificadas do arquivo.
+        """
+        # Escreve o registro1 na posição posicao2
+        arquivo.seek(4 + posicao2 * self.tamanho_registro())
+        self.salvar_registro(arquivo, registro1)
+
+        # Escreve o registro2 na posição posicao1
+        arquivo.seek(4 + posicao1 * self.tamanho_registro())
+        self.salvar_registro(arquivo, registro2)
 
     def imprimir_codigos(self, arquivo):
         arquivo.seek(4)  # Pular os primeiros 4 bytes, como no seu código original
@@ -296,7 +464,14 @@ class EntidadeBase:
                     self.imprimir_codigos(arquivo)
                     print()  # Linha em branco para separar as partições
 
-    def ordenar_base(self, arquivo, m):
-        self.selecao_natural(arquivo, m)
-        self.intercalacao_otima(m)
+    def ordenar_base(self, arquivo, m,depuracao=False):
+        self.selecao_natural(arquivo, m,depuracao = depuracao)
+        self.intercalacao_otima(m,depuracao=depuracao)
         print(f'Base {self.__class__.__name__} ordenada com sucesso!')
+
+    def sobrescrever(self,arquivo, registro):
+        posicao = arquivo.tell()
+        tamanho_registro = registro.tamanho_registro()
+        arquivo.seek(posicao - tamanho_registro)
+        registro.salvar_registro(arquivo, registro)
+

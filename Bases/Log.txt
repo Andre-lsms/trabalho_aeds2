@@ -1,0 +1,83 @@
+
+Base de dados com 100 registros
+Tamanho da memória: 10 Seleção Natural:
+Número de leituras: 109
+Número de escritas: 130
+Tempo de execução: 0.01 segundos
+
+Intercalação Ótima:
+Número de leituras: 105
+Número de escritas: 100
+Tempo de execução: 0.0 segundos
+
+Ordenação Externa por Geração de Partições:
+Número de leituras: 214
+Número de escritas: 230
+Tempo de execução: 0.01 segundos
+
+Bubble Sort:
+Número de leituras: 9828
+Número de escritas: 4604
+Tempo de execução: 0.04 segundos
+
+
+Base de dados com 1000 registros
+Tamanho da memória: 100 Seleção Natural:
+Número de leituras: 1099
+Número de escritas: 1300
+Tempo de execução: 0.02 segundos
+
+Intercalação Ótima:
+Número de leituras: 1005
+Número de escritas: 1000
+Tempo de execução: 0.01 segundos
+
+Ordenação Externa por Geração de Partições:
+Número de leituras: 2104
+Número de escritas: 2300
+Tempo de execução: 0.03 segundos
+
+Bubble Sort:
+Número de leituras: 997810
+Número de escritas: 483474
+Tempo de execução: 4.54 segundos
+
+
+Base de dados com 10000 registros
+Tamanho da memória: 1000 Seleção Natural:
+Número de leituras: 10999
+Número de escritas: 13000
+Tempo de execução: 0.43 segundos
+
+Intercalação Ótima:
+Número de leituras: 10005
+Número de escritas: 10000
+Tempo de execução: 0.06 segundos
+
+Ordenação Externa por Geração de Partições:
+Número de leituras: 21004
+Número de escritas: 23000
+Tempo de execução: 0.48 segundos
+
+Bubble Sort:
+Número de leituras: 99943990
+Número de escritas: 50720722
+Tempo de execução: 576.38 segundos
+
+
+Base de dados com 100000 registros
+Tamanho da memória: 10000 Seleção Natural:
+Número de leituras: 109999
+Número de escritas: 130000
+Tempo de execução: 62.11 segundos
+
+Intercalação Ótima:
+Número de leituras: 100005
+Número de escritas: 100000
+Tempo de execução: 0.73 segundos
+
+Ordenação Externa por Geração de Partições:
+Número de leituras: 210004
+Número de escritas: 230000
+Tempo de execução: 62.84 segundos
+

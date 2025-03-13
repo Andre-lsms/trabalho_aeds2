@@ -3,7 +3,7 @@ from time import time
 
 
 
-def pesquisa_sequencial(id,arquivo,entidade):
+def pesquisa_sequencial(id,arquivo,entidade,log):
     quant_arquivos = entidade.quantidade_registros(arquivo)
     arquivo.seek(4)
     t_inicio = time()
@@ -12,15 +12,15 @@ def pesquisa_sequencial(id,arquivo,entidade):
         registro = entidade.ler_registro(arquivo)
         comparacoes += 1
         if registro.codigo == id:
-            print(f"Registro [{id}]encontrado")
-            print(f"comparacoes: {comparacoes}")
-            print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
+            log.write(f"Registro [{id}]encontrado")
+            log.write(f"comparacoes: {comparacoes}")
+            log.write(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
             # entidade.imprimir(registro)
             return registro
-    print(f"Registro [{id}] não encontrado")
+    log.write(f"Registro [{id}] não encontrado")
     return -1
 
-def pesquisa_binaria(id, arquivo, entidade):
+def pesquisa_binaria(id, arquivo, entidade,log):
     tamanho = entidade.tamanho_arquivo(arquivo)
     quant_arquivos = tamanho // entidade.tamanho_registro()
     t_inicio = time()
@@ -34,11 +34,11 @@ def pesquisa_binaria(id, arquivo, entidade):
         registro = entidade.ler_registro(arquivo)
         comparacoes += 1
         if registro.codigo == id:
-            print(f"Registro [{id}] encontrado")
-            print(f"comparacoes: {comparacoes}")
-            print(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
+            log.write(f"Registro [{id}] encontrado")
+            log.write(f"comparacoes: {comparacoes}")
+            log.write(f"Tempo: {(time() - t_inicio) * 1000:.2f}")
             bigo = math.ceil(math.log2(quant_arquivos))
-            print(f'Pior caso: {bigo}')
+            log.write(f'Pior caso: {bigo}')
             # entidade.imprimir(registro)
             return meio
         elif registro.codigo < id:
