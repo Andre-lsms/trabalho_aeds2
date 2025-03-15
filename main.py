@@ -3,7 +3,7 @@ import struct
 
 
 def imprimir_todas_particoes(self):
-    caminho = f'Bases/Particoes/{self.__class__.__name__}'
+    caminho = f'Bases/Particoes/{self._class.name_}'
     arquivos = os.listdir(caminho)
     quantidade = len(arquivos)
     for nome_arquivo in arquivos:
@@ -39,7 +39,7 @@ clientes = Cliente()
 carros = Carro()
 filiais = Filial()
 alugueis = Aluguel()
-tam =100000
+tam =1000
 m = tam//10
 clientes.criar_base(tam, arquivo=arquivo_cliente)
 carros.criar_base(tam, arquivo=arquivo_carro)

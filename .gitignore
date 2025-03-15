@@ -176,3 +176,6 @@ cython_debug/
 .idea/trabalho_aeds2_pt1.iml
 .idea/vcs.xml
 *.dat
+main.py
+*.txt
+main.py

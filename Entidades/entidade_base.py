@@ -269,8 +269,7 @@ class EntidadeBase:
             saida.write(struct.pack('i', -1))
 
             if depuracao:
-                print(f'\033[96m[INTERCALANDO]\033[0m {len(particoes)} partições')
-
+                print(f'\033[96m[INTERCALANDO {len(particoes)} partições]\033[0m {[p.name for p in particoes]} \033[0m  ')
             leituras_atuais, escritas_atuais,tempo_atuais  = self.intercalacao_basica(particoes, saida, depuracao)
             leituras += leituras_atuais
             escritas += escritas_atuais
