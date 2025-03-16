@@ -14,14 +14,14 @@ c_carros = Carro()
 
 class Aluguel(EntidadeBase):
 
-    def __init__(self, marcador=None, rnn_proximo=0, codigo=0, cliente: Cliente = None, carro: Carro = None,
+    def __init__(self, ocupado=None, rnn_=0, codigo=0, cliente: Cliente = None, carro: Carro = None,
                  filial: Filial = None,
                  diaria=0,
                  data_aluguel=None, tempo=0, valor_total=0, ):
         super().__init__()
         self.nome_classe = 'Aluguel'
-        self.marcador = marcador
-        self.rnn_proximo = rnn_proximo
+        self.ocupado = ocupado
+        self.rnn_ = rnn_
         self.codigo = codigo
         self.cliente = cliente
         self.carro = carro
@@ -40,8 +40,8 @@ class Aluguel(EntidadeBase):
         arquivo.write(struct.pack('i', rrn))
 
     def salvar_registro(self, arquivo, registro):
-        arquivo.write(struct.pack('2s', registro.marcador.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.rnn_proximo))
+        arquivo.write(struct.pack('2s', registro.ocupado.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.rnn_))
         arquivo.write(struct.pack('i', registro.codigo))
         arquivo.write(struct.pack('i', registro.cliente.codigo))
         arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
@@ -56,10 +56,10 @@ class Aluguel(EntidadeBase):
         rrn = arquivo.tell() - self.tamanho_registro()
         topo_pilha = self.ler_topo_pilha(arquivo)
         arquivo.seek(rrn)
-        registro.marcador = '*|'
-        registro.rnn_proximo = topo_pilha
-        arquivo.write(struct.pack('2s', registro.marcador.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.rnn_proximo))
+        registro.ocupado = '*|'
+        registro.rnn_ = topo_pilha
+        arquivo.write(struct.pack('2s', registro.ocupado.encode('utf-8')))
+        arquivo.write(struct.pack('i', registro.rnn_))
         arquivo.write(struct.pack('i', 0))
         arquivo.write(struct.pack('i', 0))
         arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
@@ -89,8 +89,8 @@ class Aluguel(EntidadeBase):
 
         arquivo.seek(topo_pilha)
         registro = self.ler_registro(arquivo)
-        proximo_topo = registro.rnn_proximo
-        self.escrever_topo_pilha(arquivo, proximo_topo)
+        _topo = registro.rnn_
+        self.escrever_topo_pilha(arquivo, _topo)
         return topo_pilha
 
     def criar_registro(self, codigo, **kwargs):
@@ -129,8 +129,8 @@ class Aluguel(EntidadeBase):
         self.valor_total = self.diaria * self.tempo
 
         return Aluguel(
-            marcador='|',
-            rnn_proximo=-1,
+            ocupado='|',
+            rnn_=-1,
             codigo=self.codigo,
             cliente=self.cliente,
             carro=self.carro,
@@ -142,7 +142,7 @@ class Aluguel(EntidadeBase):
         )
 
     def imprimir(self, registro):
-        if registro.marcador == '*|':
+        if registro.ocupado == '*|':
             return
         else:
             print(f'{95 * "_"}')
@@ -166,15 +166,15 @@ class Aluguel(EntidadeBase):
                 return None  # Evita leitura incompleta
 
             # Desempacota os dados
-            marcador, rnn_proximo, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
+            ocupado, rnn_, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
                 struct.unpack(self.get_formato(), registro_bytes)
 
             # Se for um registro excluído (*|), ignorar
-            if marcador == '*|':
+            if ocupado == '*|':
                 return -1
             return Aluguel(
-                marcador=marcador.decode('utf-8').rstrip(chr(0)),
-                rnn_proximo=rnn_proximo,
+                ocupado=ocupado.decode('utf-8').rstrip(chr(0)),
+                rnn_=rnn_,
                 codigo=codigo,
                 cliente=Cliente(codigo=id_cliente, nome=nome_cliente.decode('utf-8').rstrip(chr(0))),
                 carro=Carro(codigo=id_carro),
@@ -186,9 +186,9 @@ class Aluguel(EntidadeBase):
             )
 
         except struct.error as e:
-            print(f"Erro ao desempacotar registro na posição {posicao_atual}: {e}")
+            print(f"Erro ao desempacotar registro: {e}")
         except UnicodeDecodeError as e:
-            print(f"Erro ao decodificar marcador na posição {posicao_atual}: {e}")
+            print(f"Erro ao decodificar: {e}")
 
     def criar_base(self, tamanho, desordenada=True, **kwargs):
         arquivo = kwargs.get('arquivo')

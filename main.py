@@ -52,7 +52,7 @@ alugueis.criar_base(tam, arquivo=arquivo, arquivo_cliente=arquivo_cliente, arqui
 arquivo.seek(0)
 # arquivo_bubble = open('Bases/Aluguel_bubble.dat', 'w+b')
 # arquivo_bubble.write(arquivo.read())
-depuracao = False
+depuracao = True
 
 selecao = alugueis.selecao_natural(arquivo ,m,depuracao=depuracao)
 intercalacao = alugueis.intercalacao_otima( m,depuracao=depuracao)
