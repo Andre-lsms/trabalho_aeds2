@@ -50,7 +50,6 @@ class EntidadeBase:
             self.salvar_registro(arquivo, registro)
 
     def imprimir_base(self, arquivo):
-        arquivo.seek(4)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
                 self.imprimir(registro_lido)
@@ -62,7 +61,7 @@ class EntidadeBase:
     def tamanho_arquivo(arquivo):
         arquivo.seek(0, 2)
         tamanho = arquivo.tell()
-        return int(tamanho - 4)
+        return int(tamanho)
 
     def quantidade_registros(self, arquivo):
         return self.tamanho_arquivo(arquivo) // self.tamanho_registro()
@@ -90,9 +89,9 @@ class EntidadeBase:
         reservatorio = open(reservatorio_path, 'w+b')
         reservatorio.write(struct.pack('i', -5))
 
-        # Posiciona no início do arquivo (depois do cabeçalho)
-        arquivo.seek(4)
-        reservatorio.seek(4)
+        # Posiciona no início do arquivo
+        arquivo.seek(0)
+        reservatorio.seek(0)
 
         registros = []
         particao_atual = 0
@@ -193,7 +192,7 @@ class EntidadeBase:
                 arquivo_saida = open(f'{caminho}/particao_{particao_atual}.dat', 'w+b')
                 arquivo_saida.write(struct.pack('i', -1))
 
-                reservatorio.seek(4)
+                reservatorio.seek(0)
                 for i in range(m):
                     reg_reservatorio = self.ler_registro(reservatorio)
                     if reg_reservatorio:
@@ -201,7 +200,7 @@ class EntidadeBase:
                     else:
                         break
 
-                reservatorio.seek(4)
+                reservatorio.seek(0)
                 reservatorio.truncate()
                 ultimo_gravado = -1
                 if depuracao:
@@ -212,7 +211,7 @@ class EntidadeBase:
                     if depuracao:
                         print(f'\n\033[33m[ESVAZIANDO RESERVATÓRIO ANTES DE FINALIZAR]\033[0m')
 
-                    reservatorio.seek(4)
+                    reservatorio.seek(0)
                     while True:
                         reg_reservatorio = self.ler_registro(reservatorio)
                         if not reg_reservatorio:
@@ -302,7 +301,7 @@ class EntidadeBase:
 
     def intercalacao_basica(self, particoes, saida, depuracao=False):
         num_p = len(particoes)
-        saida.seek(4)
+        saida.seek(0)
         fim = 0
         arquivos = []
         leituras = 0
@@ -314,7 +313,7 @@ class EntidadeBase:
 
         # carrega o primeiro registro de cada arquivo
         for i in range(num_p):
-            particoes[i].seek(4)
+            particoes[i].seek(0)
             registro = self.ler_registro(particoes[i])
             leituras += 1
             if registro:
@@ -430,7 +429,7 @@ class EntidadeBase:
         self.salvar_registro(arquivo, registro2)
 
     def imprimir_codigos(self, arquivo):
-        arquivo.seek(4)  # Pular os primeiros 4 bytes, como no seu código original
+        arquivo.seek(0)
         codigos = []
 
         # Lê os registros e coleta os códigos
@@ -469,8 +468,8 @@ class EntidadeBase:
         print(f'Base {self.__class__.__name__} ordenada com sucesso!')
 
     def sobrescrever(self,arquivo, registro):
-        posicao = arquivo.tell()
-        tamanho_registro = registro.tamanho_registro()
-        arquivo.seek(posicao - tamanho_registro)
+        posicao_inicial = arquivo.tell()
+        posicao = posicao_inicial-self.tamanho_registro()
+        arquivo.seek(posicao)
         registro.salvar_registro(arquivo, registro)
-
+        arquivo.seek(posicao_inicial)
