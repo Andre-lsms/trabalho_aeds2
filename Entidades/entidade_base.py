@@ -3,6 +3,7 @@ import shutil
 import struct
 import time
 from random import shuffle
+from symtable import Class
 
 from faker import Faker
 
@@ -50,6 +51,7 @@ class EntidadeBase:
             self.salvar_registro(arquivo, registro)
 
     def imprimir_base(self, arquivo):
+        arquivo.seek(0)
         while registro_lido := self.ler_registro(arquivo):
             if registro_lido is not None:
                 self.imprimir(registro_lido)
@@ -467,9 +469,11 @@ class EntidadeBase:
         self.intercalacao_otima(m,depuracao=depuracao)
         print(f'Base {self.__class__.__name__} ordenada com sucesso!')
 
-    def sobrescrever(self,arquivo, registro):
-        posicao_inicial = arquivo.tell()
-        posicao = posicao_inicial-self.tamanho_registro()
-        arquivo.seek(posicao)
-        registro.salvar_registro(arquivo, registro)
-        arquivo.seek(posicao_inicial)
+    def sobrescrever(self, arquivo, registro):
+        try:
+            posicao = arquivo.tell()
+            tamanho_registro = self.tamanho_registro()
+            arquivo.seek(posicao - tamanho_registro)
+            self.salvar_registro(arquivo, registro)
+        except struct.error as e:
+            print(f"Erro ao sobrescrever registro: {e}")

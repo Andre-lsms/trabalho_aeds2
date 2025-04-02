@@ -40,20 +40,21 @@ class Aluguel(EntidadeBase):
         arquivo.write(struct.pack('i', rrn))
 
     def salvar_registro(self, arquivo, registro):
-
-        posicao = arquivo.tell()
-        arquivo.write(struct.pack('?', registro.ocupado))
-        arquivo.write(struct.pack('i', registro.proximo))
-        arquivo.write(struct.pack('i', registro.codigo))
-        arquivo.write(struct.pack('i', registro.cliente.codigo))
-        arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.carro.codigo))
-        arquivo.write(struct.pack('i', registro.filial.codigo))
-        arquivo.write(struct.pack('10s', registro.data_aluguel.encode('utf-8')))
-        arquivo.write(struct.pack('i', registro.tempo))
-        arquivo.write(struct.pack('i', registro.diaria))
-        arquivo.write(struct.pack('i', registro.valor_total))
-        return posicao
+        try:
+            posicao = arquivo.tell()
+            arquivo.write(struct.pack('?', registro.ocupado))
+            arquivo.write(struct.pack('i', registro.proximo))
+            arquivo.write(struct.pack('i', registro.codigo))
+            arquivo.write(struct.pack('i', registro.cliente.codigo))
+            arquivo.write(struct.pack('30s', registro.cliente.nome.encode('utf-8')))
+            arquivo.write(struct.pack('i', registro.carro.codigo))
+            arquivo.write(struct.pack('i', registro.filial.codigo))
+            arquivo.write(struct.pack('10s', registro.data_aluguel.encode('utf-8')))
+            arquivo.write(struct.pack('i', registro.tempo))
+            arquivo.write(struct.pack('i', registro.diaria))
+            arquivo.write(struct.pack('i', registro.valor_total))
+        except struct.error as e:
+            print(f"Erro ao empacotar registro: {e}")
 
     def criar_registro(self, codigo, **kwargs):
         arquivo_cliente = kwargs.get('arquivo_cliente')
@@ -113,13 +114,12 @@ class Aluguel(EntidadeBase):
         print(f"Tempo: {registro.tempo} Dias")
         print(f"Diária: R${registro.diaria}")
         print(f"Valor Total: R${registro.valor_total}")
-        print(f'proximo: {registro.proximo}')
+        print(f'ocupado: {registro.ocupado}')
         print(f'{96 * "_"}')
 
-    def ler_registro(self, arquivo,posicao = None):
-        if posicao is not None:
-            if posicao != -1:
-                arquivo.seek(posicao)
+
+    def ler_registro(self, arquivo):
+
         try:
             registro_bytes = arquivo.read(self.tamanho_registro())
 
@@ -129,7 +129,6 @@ class Aluguel(EntidadeBase):
             # Desempacota os dados
             ocupado, proximo, codigo, id_cliente, nome_cliente, id_carro, id_filial, data_aluguel, tempo, diaria, valor_total = \
                 struct.unpack(self.get_formato(), registro_bytes)
-            print(f'codigo no ler_registro: {codigo}')
             return Aluguel(
                 ocupado=ocupado,
                 proximo=proximo,
@@ -161,19 +160,23 @@ class Aluguel(EntidadeBase):
             raise ValueError("O arquivo não foi informado")
 
         print(f'Gerando a base de dados tamanho {tamanho}...')
-        codigos = [930, 979, 727, 915, 625, 145]
+        codigos = [49, 51, 59, 3, 87, 103,  # seus elementos originais
+             12, 34, 56, 78, 90, 123, 45, 67, 89, 101,
+             23, 46, 68, 91, 114, 137, 159, 182, 205,
+             28, 52, 77, 102, 127, 153, 179, 206, 233,
+             31, 63, 96, 130, 165, 201, 238, 276, 315,
+             37, 75, 114, 154, 195, 237, 280, 324]
+
         #
         # for i in range(tamanho):
         #     codigos.append(random.randint(1, 1000))
-        print(f'base{codigos}')
         for i in range(len(codigos)):
+            arquivo.seek(i*self.tamanho_registro())
+            print('Gerando registro endereco', arquivo.tell())
             registro = self.criar_registro(codigo=codigos[i], arquivo_cliente=arquivo_cliente,
                                            arquivo_carro=arquivo_carro,
                                            arquivo_filial=arquivo_filial)
-            if tabela_hash:
-                self.salvar_registro(arquivo, registro)
-                tabela_hash.inserir(registro)
-
+            tabela_hash.insercao(registro)
 
     def get_formato(self):
         return '=?iii30sii10siii'
