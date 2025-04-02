@@ -436,7 +436,7 @@ class EntidadeBase:
 
         # Lê os registros e coleta os códigos
         while registro_lido := self.ler_registro(arquivo):
-            if registro_lido is not None:
+            if registro_lido is not None and registro_lido.ocupado:
                 codigos.append(registro_lido.codigo)
 
         # Exibe os códigos em formato de matriz

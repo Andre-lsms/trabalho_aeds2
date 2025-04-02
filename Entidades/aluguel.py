@@ -76,8 +76,8 @@ class Aluguel(EntidadeBase):
                 self.carro = self.escolher_registro_aleatorio(arquivo_carro, c_carros)
                 if self.carro.disponivel:
                     break
-        self.carro.disponivel = False
-        self.carro.sobrescrever(arquivo_carro, self.carro)
+                self.carro.disponivel = False
+                self.carro.sobrescrever(arquivo_carro, self.carro)
 
         if self.filial is None:
             self.filial = self.escolher_registro_aleatorio(arquivo_filial, f_filiais)
@@ -103,19 +103,18 @@ class Aluguel(EntidadeBase):
         )
 
     def imprimir(self, registro):
-
-        print(f'{95 * "_"}')
-        print(f"Código: {registro.codigo}")
-        print(f"ID Cliente: {registro.cliente.codigo}")
-        print(f"Nome Cliente: {registro.cliente.nome.strip()}")
-        print(f"ID Carro: {registro.carro.codigo}")
-        print(f"ID Filial: {registro.filial.codigo}")
-        print(f"Data do Aluguel: {registro.data_aluguel}")
-        print(f"Tempo: {registro.tempo} Dias")
-        print(f"Diária: R${registro.diaria}")
-        print(f"Valor Total: R${registro.valor_total}")
-        print(f'ocupado: {registro.ocupado}')
-        print(f'{96 * "_"}')
+        if registro.ocupado:
+            print(f'{95 * "_"}')
+            print(f"Código: {registro.codigo}")
+            print(f"ID Cliente: {registro.cliente.codigo}")
+            print(f"Nome Cliente: {registro.cliente.nome.strip()}")
+            print(f"ID Carro: {registro.carro.codigo}")
+            print(f"ID Filial: {registro.filial.codigo}")
+            print(f"Data do Aluguel: {registro.data_aluguel}")
+            print(f"Tempo: {registro.tempo} Dias")
+            print(f"Diária: R${registro.diaria}")
+            print(f"Valor Total: R${registro.valor_total}")
+            print(f'{96 * "_"}')
 
 
     def ler_registro(self, arquivo):
@@ -148,7 +147,7 @@ class Aluguel(EntidadeBase):
             print(f"Erro ao decodificar: {e}")
 
     def criar_base(self, tamanho, desordenada=True,tabela_hash=None, **kwargs):
-
+        tabela_hash.inicializar_tabela()
 
         arquivo = kwargs.get('arquivo')
         arquivo_cliente = kwargs.get('arquivo_cliente')
@@ -160,19 +159,19 @@ class Aluguel(EntidadeBase):
             raise ValueError("O arquivo não foi informado")
 
         print(f'Gerando a base de dados tamanho {tamanho}...')
-        codigos = [49, 51, 59, 3, 87, 103,  # seus elementos originais
-             12, 34, 56, 78, 90, 123, 45, 67, 89, 101,
-             23, 46, 68, 91, 114, 137, 159, 182, 205,
-             28, 52, 77, 102, 127, 153, 179, 206, 233,
-             31, 63, 96, 130, 165, 201, 238, 276, 315,
-             37, 75, 114, 154, 195, 237, 280, 324]
+        # codigos = [49, 51, 59, 3, 87, 103,  # seus elementos originais
+        #      12, 34, 56, 78, 90, 123, 45, 67, 89, 101,
+        #      23, 46, 68, 91, 114, 137, 159, 182, 205,
+        #      28, 52, 77, 102, 127, 153, 179, 206, 233,
+        #      31, 63, 96, 130, 165, 201, 238, 276, 315,
+        #      37, 75, 114, 154, 195, 237, 280, 324]
+        codigos = []
 
-        #
-        # for i in range(tamanho):
-        #     codigos.append(random.randint(1, 1000))
+
+        for i in range(tamanho):
+            # codigos.append(random.randint(1, 1000))
+            codigos.append(i+1)
         for i in range(len(codigos)):
-            arquivo.seek(i*self.tamanho_registro())
-            print('Gerando registro endereco', arquivo.tell())
             registro = self.criar_registro(codigo=codigos[i], arquivo_cliente=arquivo_cliente,
                                            arquivo_carro=arquivo_carro,
                                            arquivo_filial=arquivo_filial)
