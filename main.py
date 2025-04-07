@@ -5,6 +5,7 @@ from Entidades.aluguel import Aluguel
 from Entidades.carro import Carro
 from Entidades.clientes import Cliente
 from Entidades.filial import Filial
+from Entidades.tabela_hash import Tabela_hash
 from telas.colors import *
 from telas.pg_aluguel import criar_aluguel
 from telas.pg_dados import data_page
@@ -14,15 +15,19 @@ import time
 import os
 if not os.path.exists('Bases'):
     os.makedirs('Bases')
-cliente = Cliente()
-carro = Carro()
-filial = Filial()
-aluguel = Aluguel()
+arquivo_hash = open('Bases/tabela.dat', 'w+b')
 arquivo_cliente = open('Bases/cliente.dat', 'w+b')
 arquivo_carro = open('Bases/carro.dat', 'w+b')
 arquivo_filial = open('Bases/filial.dat', 'w+b')
 arquivo_aluguel = open('Bases/aluguel.dat', 'w+b')
 arquivo_log = open('Bases/log.txt', "w+")
+cliente = Cliente()
+carro = Carro()
+filial = Filial()
+aluguel = Aluguel()
+tabela_hash = Tabela_hash(23,arquivo_hash,arquivo_aluguel)
+
+
 arquivo_cliente.seek(0)
 arquivo_carro.seek(0)
 arquivo_filial.seek(0)
