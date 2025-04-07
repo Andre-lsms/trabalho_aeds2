@@ -1,6 +1,4 @@
 import struct
-import time
-
 import flet as ft
 from colorama import Style, Fore
 from Entidades.aluguel import Aluguel
@@ -13,12 +11,13 @@ from telas.pg_dados import data_page
 from telas.home import home
 from telas.pg_cliente import pg_clientes
 import time
-
+import os
+if not os.path.exists('Bases'):
+    os.makedirs('Bases')
 cliente = Cliente()
 carro = Carro()
 filial = Filial()
 aluguel = Aluguel()
-
 arquivo_cliente = open('Bases/cliente.dat', 'w+b')
 arquivo_carro = open('Bases/carro.dat', 'w+b')
 arquivo_filial = open('Bases/filial.dat', 'w+b')
@@ -68,8 +67,7 @@ def main(page: ft.Page):
     pag_home = home(page, arquivo_aluguel, arquivo_cliente, arquivo_carro, arquivo_filial, arquivo_log)
     pag_aluguel = criar_aluguel(page, arquivo_aluguel, arquivo_cliente, arquivo_carro, arquivo_filial, arquivo_log)
     pag_cliente = pg_clientes(page, arquivo_cliente, arquivo_log)
-    page.session.set("bases_ordenadas", False)
-    page.session.set("tipo_pesquisa", "Sequencial")
+
 
     header = ft.Row(
         controls=[
@@ -103,44 +101,8 @@ def main(page: ft.Page):
         unselected_label_color=texto_padrao(),
     )
 
-    opcoes = ft.Dropdown(
-        label='Tipo de busca',
-        hint_text="Sequencial",
-        value='Sequencial',
-        border_color=botao_laranja(),
-        width=300,
-        border_radius=10,
-        error_text="",  # Inicialmente sem erro
-        color=texto_padrao(),
-        error_style=ft.TextStyle(color=laranja_aviso(), size=12, weight=ft.FontWeight.BOLD),
-        label_style=ft.TextStyle(color=texto_padrao(), size=12, weight=ft.FontWeight.BOLD),
-        bgcolor=fundo(),
-        icon_enabled_color=botao_laranja(),
 
-        options=[
-            ft.dropdown.Option("Sequencial"),
-            ft.dropdown.Option("Binaria"),
-        ],
-        on_change=lambda e: validar_opcao(e),  # Chama a função para validar a opção
 
-    )
-    sort_bar = ft.Row(controls=[opcoes])
-
-    def validar_opcao(e):
-        if e.control.value == "Binaria" and not page.session.get('bases_ordenadas'):
-            for i in range(3, 0, -1):
-                e.control.error_text = f"Base deve estar ordenada. Retornando em: {i}"
-                e.page.update()
-                time.sleep(1)
-            e.page.update()
-            e.control.value = "Sequencial"
-            page.session.set("tipo_pesquisa", e.control.value)
-            e.control.error_text = ""
-            e.page.update()
-        else:
-            page.session.set("tipo_pesquisa", e.control.value)
-            e.control.error_text = ""
-            e.control.update()
 
     def update_content(index):
         content_container.controls.clear()
@@ -161,7 +123,7 @@ def main(page: ft.Page):
             controls=[
                 ft.Container(
                     ft.Row(
-                        controls=[header, tabs, sort_bar],
+                        controls=[header, tabs],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         spacing=150,
 
